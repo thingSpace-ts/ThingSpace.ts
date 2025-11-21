@@ -29,8 +29,15 @@ sealed class Field {
     abstract val required: Boolean
 }
 
-// TextField, DateTimeField, NumberField extend the Field interface
+// TextField, DateTimeField extend the Field interface
 // ? = null makes some parts nullable (can be empty)
+data class TitleField(
+    override val _id: String,
+    override val label: String = "Title",
+    override val required: Boolean = true,
+    val content: String? = null
+) : Field()
+
 data class TextField(
     override val _id: String,
     override val label: String,
@@ -71,6 +78,7 @@ class FieldDeserializer : JsonDeserializer<Field> {
         cleanJson.remove("fieldType")
         
         return when (fieldType) {
+            "title" -> context.deserialize(cleanJson, TitleField::class.java)
             "text" -> context.deserialize(cleanJson, TextField::class.java)
             "datetime" -> {
                 // Convert string dates to LocalDateTime objects and create DateTimeField directly

@@ -210,6 +210,7 @@ fun NoteCreationBody(
 
         Spacer(modifier = Modifier.height(spacing.large))
 
+        // Tags Input Section
         TagsInputSection(
             tags = creationState.tags,
             onTagAdded = callbacks.onTagAdded,
@@ -218,6 +219,13 @@ fun NoteCreationBody(
 
         Spacer(modifier = Modifier.height(spacing.large))
 
+        // Title Section
+        TitleInputSection(
+            fields = creationState.fields,
+            onFieldUpdated = callbacks.onFieldUpdated
+        )
+
+        Spacer(modifier = Modifier.height(spacing.large))
         // Fields Section
         FieldsSection(
             fields = creationState.fields,
@@ -375,6 +383,51 @@ private fun TagsList(
 }
 
 @Composable
+private fun TitleInputSection(
+    fields: List<FieldCreationData>,
+    onFieldUpdated: (String, FieldUpdate) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val titleField = fields.find { it.type == FieldType.TITLE }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(spacing.medium)
+        ) {
+            Text(
+                text = "Title",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.height(spacing.small))
+
+            if (titleField != null) {
+                OutlinedTextField(
+                    value = (titleField.content as? String) ?: "",
+                    onValueChange = {
+                        onFieldUpdated(titleField.id, FieldUpdate.Content(it))
+                    },
+                    label = { Text("Title:") },
+                    placeholder = { Text("Enter note title...") },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = (titleField.content as? String).isNullOrBlank()
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun FieldsSection(
     fields: List<FieldCreationData>,
     noteType: NoteType,
@@ -455,7 +508,8 @@ private fun FieldsList(
             modifier = Modifier.padding(vertical = spacing.medium)
         )
     } else {
-        fields.forEach { field ->
+        // prevents title field from showing in the all fields section
+        fields.filter { it.type != FieldType.TITLE }.forEach { field ->
             FieldEditCard(
                 field = field,
                 noteType = noteType,
@@ -503,12 +557,14 @@ private fun FieldEditCard(
 
             Spacer(modifier = Modifier.height(spacing.small))
 
-            OutlinedTextField(
-                value = field.label,
-                onValueChange = { onFieldUpdated(FieldUpdate.Label(it)) },
-                label = { Text(stringResource(R.string.label)) },
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (field.type != FieldType.TITLE) {
+                OutlinedTextField(
+                    value = field.label,
+                    onValueChange = { onFieldUpdated(FieldUpdate.Label(it)) },
+                    label = { Text(stringResource(R.string.label)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
             Spacer(modifier = Modifier.height(spacing.small))
 
@@ -556,6 +612,7 @@ private fun FieldContentInputSection(
         Spacer(modifier = Modifier.height(spacing.small))
         
         when (field.type) {
+
             FieldType.TEXT -> TextFieldInput(field, onFieldUpdated)
             FieldType.DATETIME -> DateTimeFieldInput(field, onFieldUpdated, spacing)
         }

@@ -24,6 +24,7 @@ import com.cpen321.usermanagement.data.remote.dto.User
 import com.cpen321.usermanagement.ui.theme.LocalFontSizes
 import com.cpen321.usermanagement.ui.theme.LocalSpacing
 import com.cpen321.usermanagement.data.remote.dto.Field
+import com.cpen321.usermanagement.data.remote.dto.TitleField
 
 @Composable
 private fun getFieldPreview(field: Field): String {
@@ -45,8 +46,11 @@ fun NoteDisplayList(
     val spacing = LocalSpacing.current
     
     for(note in notes){
-        val notePreview = note.fields.firstOrNull()?.let { getFieldPreview(it) }
-            ?: stringResource(R.string.empty_note)
+        val titleField = note.fields.find {
+            it is TitleField
+        } as? TitleField
+        val notePreview = titleField?.content?.takeIf { it.isNotEmpty() }
+            ?: stringResource(R.string.empty_note_title)
         
         Card(
             modifier = Modifier

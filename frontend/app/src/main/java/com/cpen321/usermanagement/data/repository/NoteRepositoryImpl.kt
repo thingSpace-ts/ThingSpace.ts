@@ -27,6 +27,13 @@ class NoteRepositoryImpl @Inject constructor(
     private fun convertToBackendFields(fields: List<Field>): List<Map<String, Any?>> {
         return fields.map { field ->
             when (field) {
+                is TitleField -> mapOf(
+                    "_id" to field._id,
+                    "fieldType" to "title",
+                    "label" to field.label,
+                    "required" to field.required,
+                    "content" to field.content
+                )
                 is TextField -> mapOf(
                     "_id" to field._id,
                     "fieldType" to "text",

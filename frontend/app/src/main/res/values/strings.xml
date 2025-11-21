@@ -114,6 +114,7 @@
     <string name="create_new_workspace">Create a new workspace…</string>
     <!-- Note Display -->
     <string name="empty_note">Empty note</string>
+    <string name="empty_note_title">Note</string>
     <string name="unknown">unknown</string>
     <!-- Image Picker -->
     <string name="select_image_source">Select Image Source</string>
