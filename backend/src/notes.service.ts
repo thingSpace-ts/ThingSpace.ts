@@ -44,6 +44,15 @@ export class NoteService {
             // Continue with empty vector instead of failing
         }
 
+        // Ensure title field is the first field 
+        if (!data.fields.find((f: any) => f.fieldType === 'title')) {
+            data.fields.unshift({
+                _id: new mongoose.Types.ObjectId().toString(),
+                fieldType: 'title',
+                content: ''
+            });
+        }
+
         const newNote = await noteModel.create({
             userId,
             workspaceId: data.workspaceId,

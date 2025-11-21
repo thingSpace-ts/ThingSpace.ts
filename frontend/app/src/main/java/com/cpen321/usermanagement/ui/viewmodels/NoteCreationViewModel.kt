@@ -109,12 +109,19 @@ class NoteCreationViewModel @Inject constructor(
             val noteRequest = noteRepository.getNote(noteId)
             if (noteRequest.isSuccess){
                 val note = noteRequest.getOrNull()!!
-                val fields = mutableListOf<FieldCreationData>()
+
+                val titleField = _creationState.value.fields.find { it.type == FieldType.TITLE }!!
+                val fields = mutableListOf(titleField)
+
                 for (field in note.fields){
+                    /* skip over title */
+                    if (field is TitleField) continue
                     val fieldType = when(field) {
                         is TextField -> {
                             FieldType.TEXT
                         }
+                        /* added TitleField purely for exhaustiveness of when condition */
+                        is TitleField -> FieldType.TITLE
                         is DateTimeField -> {
                             FieldType.DATETIME
                         }
@@ -199,6 +206,10 @@ class NoteCreationViewModel @Inject constructor(
     }
 
     private fun validateFields(): String? {
+        val titleField = _creationState.value.fields.find { it.type == FieldType.TITLE }
+        if (titleField?.content == null || (titleField.content as? String).isNullOrBlank()) {
+            return "Title is required"
+        }
         if (_creationState.value.fields.isEmpty()) {
             return "Please add at least one field"
         }
