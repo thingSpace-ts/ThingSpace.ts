@@ -229,6 +229,9 @@ class NoteEditViewModel @Inject constructor(
         if (titleField == null || (titleField.content as? String).isNullOrBlank()) {
             return "Please enter a title"
         }
+        if (_editState.value.tags.isEmpty()){
+            return "Please enter at least one tag"
+        }
         return null
     }
 
