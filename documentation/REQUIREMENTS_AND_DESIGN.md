@@ -249,15 +249,11 @@ NOTES: 5 most major use cases
    - **Justification**: Several messaging/file sharing applications, such as Discord, have every conversation reachable with maximum of 2 clicks (Discord server - specific channel, or discord dms - particular chat; WhatsApp community - particular chat). The app will be feature-rich, however it should still be competitive wrt. usability.
 
 2. **[Searching Speed]**
-   - **Description**: Producing a page of synonymic search result on the backend side should last no longer than 5 seconds
+   - **Description**: Producing the result of synonymic search filtered with tags on the backend side should last no longer than 5 seconds
    - **Justification**: Synonymic searching includes calling an API to check for synonyms. While this process can take time and fitting below a second of response time is unlikely (at least not guaranteeable before actual tests with the API), we should not get close to the 10 seconds response limit mentioned in https://www.nngroup.com/articles/response-times-3-important-limits/
    The 10 seconds is the user attention limit, i.e. the time the user is said to be willing to wait without attempting to focus on other tasks. As we envision synonymic search being used frequently, getting close to this limit on regular basis would mean straining the user attention, hence we impose a safety factor of 2.
-   One might point out that while the note database gets larger, there is more notes to search and more matches, hence the response time shall increase. This is why the requirement only concerns itself with one page of search results. While the note base increases, we would get more direct matches, and the first page could get populated with those ones while the app is looking for less direct matches in the background.
-
-3. **[Filtering Speed]**
-   - **Description**: Updating the display with a page of filtering (by tag or creation/last edit) results should take no longer than 1 second.
-   - **Justification**: This is so that the user is not significantly disturbed by waiting for the response, as mentioned in https://www.nngroup.com/articles/response-times-3-important-limits/
-   Again, while with increasing number of notes, the response time shall increase as well, filtering done by this app is an O(n) operation, and does not disturb the sorting of the data. More importantly, only a part of results that fit the filter have to be created. This is again, because the requirement only concerns itself with one page of results at a time, which is what the user will see.
+   One might point out that while the note database gets larger, there is more notes to search and more matches, hence the response time shall increase. This is why the requirement only concerns itself with one page of search results. Indeed this requirement can only be tested for a specified amount of notes, in our case it has been tested with 400 potentially matching notes, which we consider suitable for a regular worksapce used by a few users. If one were to adapt this app to much larger flows of notes, there are ways to keep the response time bounded such as returning only up to n best matches to search criterion, or employing parallel computation. 
+   The requirements for search and filter use cases have been merged together into this one, due to the app always filtering and then applying KNN on the already filtered notes.
 
 
 ## 4. Designs Specification
