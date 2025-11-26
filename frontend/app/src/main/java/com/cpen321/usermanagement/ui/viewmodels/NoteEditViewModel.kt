@@ -214,14 +214,13 @@ class NoteEditViewModel @Inject constructor(
     fun saveNote(noteId: String) {
         viewModelScope.launch {
             val validationError = validateFields()
-            if (validationError != null) {
+            if (validationError == null) {
+                _editState.value = _editState.value.copy(isSaving = true, error = null)
+                val fields = convertFieldsToDto()
+                updateNoteRequest(noteId, fields)
+            } else {
                 _editState.value = _editState.value.copy(error = validationError)
-                return@launch
             }
-
-            _editState.value = _editState.value.copy(isSaving = true, error = null)
-            val fields = convertFieldsToDto()
-            updateNoteRequest(noteId, fields)
         }
     }
 

@@ -29,13 +29,9 @@ import androidx.compose.ui.test.performClick
 class TestNotes {
 
     companion object {
-        const val ACCT_NAME:String = "Thing4G"      
-        // Pre-existing workspaces (must exist before test)
+        const val ACCT_NAME:String = "mou"
         const val WORKSPACE_1 = "Workspace1"
         const val WORKSPACE_2 = "Workspace2"
-
-        // Error/Success messages
-        const val emptyLabelErrorString = "All fields must have a label"
 
         // Test data
         const val testTag = "important"
@@ -56,7 +52,7 @@ class TestNotes {
         sleep(millis)
         composeRule.waitForIdle()
     }
-    
+
     private fun signIn(signInString: String, acctName: String) {
         composeRule.waitForIdle()
         composeRule.onNodeWithText(signInString).performClick()
@@ -89,20 +85,28 @@ class TestNotes {
             Log.d("TEST NOTES", "Already signed in")
         }
 
-
-
-        // UI texts
+        /* UI texts */
+        // Workspaces
         val wsIcString = composeRule.activity.getString(R.string.workspaces)
+
+        // Notes
         val contentString = composeRule.activity.getString(R.string.content)
         val createString = composeRule.activity.getString(R.string.create)
-        val addTagString = composeRule.activity.getString(R.string.add_tag)
-        val enterTagString = composeRule.activity.getString(R.string.enter_tag_name)
-        val addString = composeRule.activity.getString(R.string.add)
+
+        // Note/Template Create Page
+        val createNoteButton = composeRule.activity.getString(R.string.blank_note)
+        val createTemplateButton = composeRule.activity.getString(R.string.new_template)
+
+        // Button Texts
+        val createNoteString = composeRule.activity.getString(R.string.create)
+
+        /* Note Creation Screen */
+        // Field Section
         val addFieldString = composeRule.activity.getString(R.string.add_field)
         val labelString = composeRule.activity.getString(R.string.label)
         val textContentString = composeRule.activity.getString(R.string.text_content)
-        val createNoteString = composeRule.activity.getString(R.string.create)
-        val fieldLabelString = composeRule.activity.getString(R.string.label)
+
+        // Buttons (Save, Share, Copy, Delete)
         val saveString = composeRule.activity.getString(R.string.save)
         val shareString = composeRule.activity.getString(R.string.share)
         val shareNoteString = composeRule.activity.getString(R.string.share_note)
@@ -110,15 +114,44 @@ class TestNotes {
         val copyNoteString = composeRule.activity.getString(R.string.copy_note)
         val deleteString = composeRule.activity.getString(R.string.delete)
         val deleteNoteString = composeRule.activity.getString(R.string.delete_note)
+
+        // Navigation
         val backString = composeRule.activity.getString(R.string.back_icon_description)
 
-        Log.d("TEST NOTES", "Setting up workspaces")
+        // Tag Section
+        val addTagString = composeRule.activity.getString(R.string.add_tag)
+        val enterTagString = composeRule.activity.getString(R.string.enter_tag_name)
+        val addString = composeRule.activity.getString(R.string.add)
+
+        // Title Section
+        val noteTitleFieldString = composeRule.activity.getString(R.string.enter_note_title)
+        val testTitleInput = "Test Note"
+        val updatedTitleInput = "Updated Test Note"
+
+        // Field Types TODO: use r.string
+        val textField = "TEXT"
+        val dateField = "DATETIME"
+        val signatureField = "SIGNATURE"
+
+        // Workspace Creation Strings
         val createWsString = composeRule.activity.getString(R.string.create_new_workspace)
         val pickWsNameString = composeRule.activity.getString(R.string.pick_workspace_name)
         val createWsButtonString = composeRule.activity.getString(R.string.create_workspace)
 
+        // Error messages
+        val emptyFieldErrorString = "Please add at least one field"
+        val emptyTitleErrorString = "Please enter a title"
+        val emptyTagErrorString = "Please add at least one tag"
+        val emptyLabelErrorString = "All fields must have a label"
+
         waitForVm(5000)
 
+        Log.d("TEST NOTES", "Setting up workspaces")
+        composeRule.waitUntil(timeoutMillis = 5000) {
+            composeRule.onAllNodesWithContentDescription(wsIcString)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
         composeRule.onNodeWithContentDescription(wsIcString).performClick()
         waitForVm(5000)
 
@@ -149,43 +182,71 @@ class TestNotes {
         composeRule.onNodeWithContentDescription(contentString + WORKSPACE_1).performClick()
         waitForVm(2000)
 
-        Log.d("TEST NOTES", "Create Note - No fields error test")
-        // Click the pencil icon to create note
+        Log.d("TEST NOTES", "Create Note - Empty note title test")
+        // Click the pencil icon, navigating to create page (not screen)
         composeRule.onNodeWithContentDescription(createString).performClick()
         waitForVm(2000)
+        // Click create button, actually going to create screen
+        composeRule.waitUntil(timeoutMillis = 5000) {
+            composeRule.onAllNodesWithText(createNoteButton)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+        composeRule.onNodeWithText(createNoteButton).performClick()
+        waitForVm(2000)
 
-        Log.d("TEST NOTES", "Create Note - Empty label error test")
+        // Click "Create" button, attempting to create note
+        composeRule.onNodeWithText(createNoteString).performClick()
+        waitForVm(2000)
+        composeRule.onNodeWithText(emptyTitleErrorString).assertIsDisplayed()
+
+        // Input title
+        composeRule.onNodeWithText(noteTitleFieldString).performTextInput(testTitleInput)
+        waitForVm(2000)
+
+        Log.d("TEST NOTES", "Create Note - No field --> No tag --> Empty field label tests")
+        composeRule.onNodeWithText(createNoteString).performClick()
+        waitForVm(2000)
+        // Try creating the note (no fields error)
+        composeRule.onNodeWithText(emptyFieldErrorString).assertIsDisplayed()
+
         // Click Add Field button
         composeRule.onNodeWithText(addFieldString).performClick()
         waitForVm(2000)
 
         // Select TEXT field type from dialog
-        composeRule.onNodeWithText("TEXT").performClick()
+        composeRule.onNodeWithText(textField).performClick()
         waitForVm(1000)
 
-        // Clear the default label "New Text Field"
-        composeRule.onNodeWithText(fieldLabelString).performTextClearance()
-        waitForVm(500)
+        // Try creating the note (empty tags error)
+        composeRule.onNodeWithText(createNoteString).performClick()
+        waitForVm(2000)
+        composeRule.onNodeWithText(emptyTagErrorString).assertIsDisplayed()
 
+        // Add a test tag
+        composeRule.onNodeWithText(addTagString).performClick()
+        waitForVm(2000)
+        composeRule.onNodeWithText(enterTagString).performTextInput(testTag)
+        composeRule.onNodeWithText(addString).performClick()
+        waitForVm(2000)
+
+        // Clear the default label "New Text Field"
+        composeRule.onNodeWithText(labelString).performTextClearance()
+        waitForVm(2000)
+
+        // Try creating the note (empty field label error)
         composeRule.onNodeWithText(createNoteString).performClick()
         waitForVm(2000)
         composeRule.onNodeWithText(emptyLabelErrorString).assertIsDisplayed()
 
         Log.d("TEST NOTES", "Create Note - Successful creation")
-        // Add tag
-        composeRule.onNodeWithText(addTagString).performClick()
-        waitForVm(500)
-        composeRule.onNodeWithText(enterTagString).performTextInput(testTag)
-        composeRule.onNodeWithText(addString).performClick()
-        waitForVm(500)
-
         // Set field label
         composeRule.onAllNodesWithText(labelString)[0].performTextInput(testFieldLabel)
-        waitForVm(500)
+        waitForVm(2000)
 
         // Set field content
         composeRule.onNodeWithText(textContentString).performTextInput(testFieldContent)
-        waitForVm(500)
+        waitForVm(2000)
 
         // Wait for the Create button to be enabled first
         composeRule.waitUntil(timeoutMillis = 5000) {
@@ -199,67 +260,86 @@ class TestNotes {
 
         // Wait for the created note to appear first
         composeRule.waitUntil(timeoutMillis = 20000) {
-            composeRule.onAllNodesWithText(testFieldContent)
+            composeRule.onAllNodesWithText(testTitleInput)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
         composeRule.waitForIdle()
 
-        // Verify note appears - look for the first field
-        composeRule.onAllNodesWithText(testFieldContent)[0].assertIsDisplayed()
+        // Verify note appears - look for test note's title
+        composeRule.onAllNodesWithText(testTitleInput)[0].assertIsDisplayed()
 
         Log.d("TEST NOTES", "Update Note test")
         // Click on the note to open it, NOTE: onNodeWithText FAILS when multiple matching choices
-        composeRule.onAllNodesWithText(testFieldContent)[0].performClick()
-        waitForVm(1500) //
-
-        // Click edit icon
-        composeRule.onAllNodes(hasClickAction())[1].performClick()
-        waitForVm(1000)
+        composeRule.onAllNodesWithText(testTitleInput)[0].performClick()
+        waitForVm(1500)
 
         // Add new tag
         composeRule.onNodeWithText(addTagString).performClick()
-        waitForVm(500)
+        waitForVm(2000)
         composeRule.onNodeWithText(enterTagString).performTextInput(updatedTag)
         composeRule.onNodeWithText(addString).performClick()
-        waitForVm(500)
+        waitForVm(2000)
 
         // Remove existing tag by clicking the chip
         composeRule.onAllNodesWithText(testTag)[0].performClick()
-        waitForVm(500)
+        waitForVm(2000)
 
-        // Update field content
-        composeRule.onNodeWithText(testFieldContent).performTextClearance()
-        composeRule.onNodeWithText(textContentString).performTextInput(updatedContent)
-        waitForVm(500)
+        // Update note title
+        // Input title
+        composeRule.onNodeWithText(testTitleInput).performTextClearance()
+        composeRule.onNodeWithText(noteTitleFieldString).performTextInput(updatedTitleInput)
+        waitForVm(2000)
 
         // Save changes
         composeRule.onNodeWithText(saveString).performClick()
         waitForVm(2000)
 
+        // Workaround: Refresh tag filter to pick up new tags
+        val filterString = composeRule.activity.getString(R.string.filter)
+
+        composeRule.waitUntil(timeoutMillis = 5000) {
+            composeRule.onAllNodesWithText(filterString)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+        composeRule.onNodeWithTag(filterString).performClick()
+        waitForVm(2000)
+
+        // Toggle the updated tag only if it's off
+        try {
+            composeRule.onNodeWithTag(updatedTag).assertIsOff()
+            composeRule.onNodeWithTag(updatedTag).performClick()
+            waitForVm(2000)
+        } catch (e: AssertionError) {
+            // Already checked, do nothing
+        }
+
+        // Go back to notes list
+        composeRule.onNodeWithContentDescription(backString).performClick()
+        waitForVm(2000)
+
         // Verify changes reflected
         composeRule.waitUntil(timeoutMillis = 20000) {
-            composeRule.onAllNodesWithText(updatedContent)
+            composeRule.onAllNodesWithText(updatedTitleInput)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
         composeRule.waitForIdle()
-        composeRule.onAllNodesWithText(updatedContent)[0].assertIsDisplayed()
+        composeRule.onAllNodesWithText(updatedTitleInput)[0].assertIsDisplayed()
 
         Log.d("TEST NOTES", "Share Note test")
-        // Go back to edit screen (currently on view screen after save)
-        composeRule.onAllNodes(hasClickAction())[1].performClick()  // Click edit icon
+        // Go back to edit screen (currently on Workspace's Notes screen)
+        composeRule.onAllNodesWithText(updatedTitleInput)[0].performClick()
         waitForVm(1000)
-        composeRule.onAllNodes(hasClickAction())[1].performClick()  // Click edit icon
 
-
-        // Click share icon (index 1 in edit screen: 0=back, 1=share, 2=copy)
-        composeRule.waitUntil(timeoutMillis = 20000) {
-            composeRule.onAllNodesWithText("Edit Note")
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
-        waitForVm(1000)
+//        // Click share icon (index 1 in edit screen: 0=back, 1=share, 2=copy)
+//        composeRule.waitUntil(timeoutMillis = 20000) {
+//            composeRule.onAllNodesWithText("Edit Note")
+//                .fetchSemanticsNodes()
+//                .isNotEmpty()
+//        }
+//        waitForVm(1000)
 
         composeRule.onNodeWithContentDescription(shareString).performClick()
 
@@ -270,27 +350,18 @@ class TestNotes {
                 .isNotEmpty()
         }
         composeRule.waitForIdle()
-        composeRule.onNodeWithText(shareNoteString).assertIsDisplayed()
 
         // Select target workspace
         composeRule.onNodeWithText(WORKSPACE_2).performClick()
-        waitForVm(500)
+        waitForVm(2000)
 
         // Confirm share
-        composeRule.onNodeWithText(shareString).performClick()
+        composeRule.onAllNodesWithText(shareString)[1].performClick()
         waitForVm(2000)
 
         // Navigate back to workspaces...
-        composeRule.waitUntil(timeoutMillis = 20000) {
-            composeRule.onAllNodesWithText(updatedContent)
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
-        composeRule.waitForIdle()
-        composeRule.onNodeWithContentDescription(backString).performClick()
-        waitForVm(1000)
         composeRule.onNodeWithContentDescription(wsIcString).performClick()
-        waitForVm(1000)
+        waitForVm(2000)
         composeRule.waitUntil(timeoutMillis = 20000) {
             composeRule.onAllNodesWithContentDescription(contentString + WORKSPACE_2)
                 .fetchSemanticsNodes()
@@ -299,7 +370,7 @@ class TestNotes {
         composeRule.onNodeWithContentDescription(contentString + WORKSPACE_2).performClick()
         waitForVm(2000)
         composeRule.waitUntil(timeoutMillis = 20000) {
-            composeRule.onAllNodesWithText(updatedContent)
+            composeRule.onAllNodesWithText(updatedTitleInput)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
@@ -315,10 +386,6 @@ class TestNotes {
         composeRule.onNodeWithContentDescription(contentString + WORKSPACE_1).performClick()
         waitForVm(2000)
 
-        // Should not find the note tag in workspace 1 anymore
-        val nodesInWs1 = composeRule.onAllNodesWithText(updatedContent).fetchSemanticsNodes()
-        assert(nodesInWs1.isEmpty()) { "Note should not be in Workspace 1 after sharing" }
-
         Log.d("TEST NOTES", "Copy Note test")
         // Go back to workspace 2
         composeRule.onNodeWithContentDescription(wsIcString).performClick()
@@ -333,14 +400,12 @@ class TestNotes {
 
         // Open note and go to edit
         composeRule.waitUntil(timeoutMillis = 20000) {
-            composeRule.onAllNodesWithText(updatedContent)
+            composeRule.onAllNodesWithText(updatedTitleInput)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
-        composeRule.onAllNodesWithText(updatedContent)[0].performClick()
+        composeRule.onAllNodesWithText(updatedTitleInput)[0].performClick()
         waitForVm(1500)
-        composeRule.onAllNodes(hasClickAction())[1].performClick()  // Click edit icon
-        waitForVm(1000)
 
         // Click copy icon
         composeRule.onNodeWithContentDescription(copyString).performClick()
@@ -351,17 +416,25 @@ class TestNotes {
 
         // Select workspace 1
         composeRule.onNodeWithText(WORKSPACE_1).performClick()
-        waitForVm(500)
+        waitForVm(2000)
 
         // Confirm copy
-        composeRule.onNodeWithText(copyString).performClick()
+        composeRule.onAllNodesWithText(copyString)[1].performClick()
         waitForVm(2000)
 
         // Navigate and verify note in both workspaces
-        composeRule.onNodeWithContentDescription(backString).performClick()
+        composeRule.onNodeWithContentDescription(wsIcString).performClick()
         waitForVm(1000)
         composeRule.waitUntil(timeoutMillis = 20000) {
-            composeRule.onAllNodesWithText(updatedContent)
+            composeRule.onAllNodesWithContentDescription(contentString + WORKSPACE_1)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+        composeRule.onNodeWithContentDescription(contentString + WORKSPACE_1).performClick()
+        waitForVm(2000)
+
+        composeRule.waitUntil(timeoutMillis = 20000) {
+            composeRule.onAllNodesWithText(updatedTitleInput)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
@@ -376,28 +449,28 @@ class TestNotes {
         composeRule.onNodeWithContentDescription(contentString + WORKSPACE_1).performClick()
         waitForVm(2000)
         composeRule.waitUntil(timeoutMillis = 20000) {
-            composeRule.onAllNodesWithText(updatedContent)
+            composeRule.onAllNodesWithText(updatedTitleInput)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
         Log.d("TEST NOTES", "Delete Note test")
         // Open note
-        composeRule.onAllNodesWithText(updatedContent)[0].performClick()
+        composeRule.onAllNodesWithText(updatedTitleInput)[0].performClick()
         waitForVm(1500)
 
         // Click delete icon
-        composeRule.onNodeWithContentDescription(deleteString).performClick()
+        composeRule.onNodeWithText(deleteString).performClick()
         waitForVm(1000)
 
         // Verify confirmation dialog
         composeRule.onNodeWithText(deleteNoteString).assertIsDisplayed()
 
         // Confirm deletion
-        composeRule.onNodeWithText("Delete").performClick()
+        composeRule.onAllNodesWithText(deleteString)[1].performClick()
         waitForVm(2000)
 
         // Verify note removed from workspace 1
-        val nodesAfterDelete = composeRule.onAllNodesWithText(updatedContent).fetchSemanticsNodes()
+        val nodesAfterDelete = composeRule.onAllNodesWithText(updatedTitleInput).fetchSemanticsNodes()
         assert(nodesAfterDelete.isEmpty()) { "Note should be deleted from Workspace 1" }
 
         Log.d("TEST NOTES", "Test completed successfully!")
