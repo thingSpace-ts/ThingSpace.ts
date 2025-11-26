@@ -3,6 +3,7 @@ package com.cpen321.usermanagement.ui.screens
 import Button
 import Icon
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -121,6 +122,8 @@ fun WsProfileManagerScreen(
     wsProfileManagerViewModel: WsProfileManagerViewModel,
     featureActions: FeatureActions,
 ) {
+    BackHandler { featureActions.ws.navigateToWsSelect() }
+
     val uiState by wsProfileManagerViewModel.uiState.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
 

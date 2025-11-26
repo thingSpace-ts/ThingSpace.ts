@@ -2,6 +2,7 @@ package com.cpen321.usermanagement.ui.screens
 
 import Button
 import Icon
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -69,6 +70,8 @@ fun TemplateScreen(
     featureActions: FeatureActions
 ) {
     val fetching by templateViewModel.fetching.collectAsState()
+
+    BackHandler { featureActions.navs.navigateToMainTagReset(featureActions.state.getWorkspaceId()) }
 
     val actions = TemplateActions(
         onNoteClick = { noteId:String -> featureActions.navs.navigateToNoteCreation(NoteType.CONTENT, noteId) },
