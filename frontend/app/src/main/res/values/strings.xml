@@ -38,7 +38,7 @@
     <string name="main_workspace_content">main workspace content</string>
     <string name="view_profile">Profile View</string>
     <string name="plusContent">&#160;- Notes</string>
-    <string name="plusTemplates">&#160;- Create from a Template</string>
+    <string name="plusTemplates">&#160;- Create Notes</string>
     <string name="plusChat">&#160;- Chat</string>
     <!-- Icon content descriptions -->
     <string name="content">Notes</string>
@@ -110,6 +110,7 @@
     <string name="text_template">[TEXT FIELD]</string>
     <string name="datetime_template">[DATETIME FIELD]</string>
     <string name="signature_template">[SIGNATURE FIELD]</string>
+    <string name="create_note_from_template">"Create Note from Template"</string>
     <!-- Filter screen -->
     <string name="all">All</string>
     <string name="filter">Filter</string>

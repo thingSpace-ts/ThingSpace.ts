@@ -202,7 +202,6 @@ describe('Notes API – Search Latency Test (Non-Functional Requirement)', () =>
             `Search ${i + 1} failed with status ${res.status}: ${JSON.stringify(res.body)}`
           );
         }
-        
         // Assertions for each search
         expect(res.status).toBe(200);
         expect(res.body.message).toBe('Notes retrieved successfully');
@@ -210,15 +209,7 @@ describe('Notes API – Search Latency Test (Non-Functional Requirement)', () =>
         expect(res.body.data.notes).toBeDefined();
         expect(Array.isArray(res.body.data.notes)).toBe(true);
         
-        // Print first 3 notes
-        const notes = res.body.data.notes;
-        console.log(`Found ${notes.length} notes. First 3 notes:`);
-        for (let j = 0; j < Math.min(3, notes.length); j++) {
-          const note = notes[j];
-          const titleField = note.fields?.find((f: any) => f.label === 'Title' || f.fieldType === 'title');
-          const title = titleField?.content || 'No title';
-          console.log(`  ${j + 1}. ${title} (ID: ${note._id})`);
-        }
+        
       }
       
       // Calculate average latency

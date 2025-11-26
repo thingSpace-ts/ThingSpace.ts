@@ -128,7 +128,7 @@ class TestNotes {
         val testTitleInput = "Test Note"
         val updatedTitleInput = "Updated Test Note"
 
-        // Field Types TODO: use r.string
+        // Field Types
         val textField = "TEXT"
         val dateField = "DATETIME"
         val signatureField = "SIGNATURE"

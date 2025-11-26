@@ -225,7 +225,7 @@ private fun TemplateBody(
         val spacing = LocalSpacing.current
         TemplateLabel(wsname = wsname)
         SearchBar(
-            onSearchClick = actions.onSearchClick,//TODO: for now
+            onSearchClick = actions.onSearchClick,
             onFilterClick = actions.onFilterClick,
             onQueryChange = actions.onQueryChange,
             query = query
@@ -242,6 +242,14 @@ private fun TemplateBody(
                 start = spacing.medium, end = spacing.medium, top = spacing.small, bottom = spacing.small)) {
             Text(stringResource(R.string.new_template))
         }
+        Text(
+            text = stringResource(R.string.create_note_from_template),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = modifier
+                .padding(start = spacing.medium, top = spacing.medium, bottom = spacing.small)
+                .align(Alignment.Start)
+        )
         TemplateDisplayList(
             templates = templates,
             onTitleClick = actions.onNoteClick,
