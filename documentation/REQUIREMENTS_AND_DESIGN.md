@@ -47,7 +47,7 @@ The target audience is the general public. If one has a large amount of differen
 3. **[Workspace Manager]**: Inherits from User. Has additional options to update and delete the workspaces they own. Can also ban users from their workspace(s).
 4. **[Google OAuth API]**: External service used  for authentication.
 5. **[Open AI API]**: The role of the API would be to create vector embeddings for notes and search queries so that vector-based search algorithms, such as KNN, can be used. This is to enhance the search quality so that the user does not have to exactly match the text of the note in their prompt.
-5. **[Firebase PCloud Messaging]**: Firebase handles the logic for sending push notifications. 
+5. **[Firebase Cloud Messaging]**: Firebase handles the logic for sending push notifications. 
 
 
 ### **3.4. Use Case Description**
