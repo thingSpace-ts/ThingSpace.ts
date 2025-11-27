@@ -44,18 +44,20 @@ The target audience is the general public. If one has a large amount of differen
 ### **3.3. Actors Description**
 1. **[User]**: The general user of the application. Can fully manage (CRUD + search + template creation)their own notes. Can join and create workspaces.
 2. **[Workspace Member]** - can contribute to workspaces they are in by sending notes and chat messages, as well as inviting new members.
-3. **[Workspace Manager]**: Inherits from User. Has additional options to update and delete the workspaces they own. Can also ban users from their workspace(s).
-4. **[Google OAuth API]**: External service used  for authentication.
-5. **[Open AI API]**: The role of the API would be to create vector embeddings for notes and search queries so that vector-based search algorithms, such as KNN, can be used. This is to enhance the search quality so that the user does not have to exactly match the text of the note in their prompt.
-5. **[Firebase Cloud Messaging]**: Firebase handles the logic for sending push notifications. 
+3. **[Regular Member]** - inherits from Workspace Member. Can leave workspace.
+4. **[Workspace Manager]**: Inherits from Workspace Member. Has additional options to update and delete the workspaces they own. Can also ban users from their workspace(s).
+5. **[Google OAuth API]**: External service used  for authentication.
+6. **[Open AI API]**: The role of the API would be to create vector embeddings for notes and search queries so that vector-based search algorithms, such as KNN, can be used. This is to enhance the search quality so that the user does not have to exactly match the text of the note in their prompt.
+7. **[Firebase Cloud Messaging]**: Firebase handles the logic for sending push notifications. 
 
 
 ### **3.4. Use Case Description**
 - Use cases for feature 1: Manage Notes
 1. **Create Note**: The user can create notes by filling in a chosen note template, adding or removing fields if necessary. They can then store this note in a chosen workspace.
 2. **Update Note**: Users can update their notes and change the title, description, and other data. 
-3. **Share Note**: Users can share their note to a selected workspace.
-4. **Delete Note**: Users can delete their selected note.
+3. **Move Note**: Users can move a note to a selected workspace.
+4. **Delete Note**: Users can delete a selected note.
+5. **Copy Note**: Users can copy a note to a selected workspace, creating a clone of it in the workspace and keeping the original one in the original workspace.
 
 
 - Use cases for feature 2: Retrieve Notes
@@ -67,10 +69,10 @@ The target audience is the general public. If one has a large amount of differen
 7. **Create Workspace**: A user can create a workspace and become the manager of it.
 8. **Join Workspace**: A user can join the workspace they are invited to or reject the invitation
 9. **Invite to Workspace**: Any user that is part of a workspace can invite other users to the workspace. The invited user will be sent a push notification.
-10. **Send a Chat Message**: A user can send chat messages to other users or the workspaces that they are part of. A chat message is a new note that is sent to the users involved.
+10. **Send Chat Message**: A user can send chat messages to other users or the workspaces that they are part of. A chat message will appear on chat screens of otherusers in the workspace without a need to refresh.
 11. **Update Workspace**: The workspace manager can update workspace metadata, like title, descriptions, etc. 
 12. **Leave Workspace**: A user can leave any workspace that they are part of.
-13. **Delete Workspace**: The workspace manager can delete the workspace and all associated data
+13. **Delete Workspace**: The workspace manager can delete the workspace and all associated data.
 14. **Ban users**: The workspace owner can ban a user, kicking them out and preventing them from joining in the future. 
 
 
@@ -79,8 +81,7 @@ The target audience is the general public. If one has a large amount of differen
 16. **Update Template**: A user can update their templates, editing the components. 
 17. **Delete Template**: A user can delete their templates, and will not be able to use it for future notes. 
 
-
-
+- In addition to that: sign up, sign in, sign out and delete account use cases from M1.
 
 ...
 
@@ -399,11 +400,19 @@ NOTES: 5 most major use cases
 3. **[Retrofit]**
     - **Purpose**: Managing API calls and frontend-backend connection
     - **Reason**: Streamlines dependency management and improves testability in Android apps.
+
+4. **[Jetpack Compose Testing Library + Uiautomator]**
+    - **Purpose**: Conducting automated frontend end-to-end tests
+    - **Reason**: The UI used is a Jetpack Compose UI, as such it cannot be tested with espresso etc., but requires the dedicated testing module, Uiautomator needed to be added to manage permission pop-ups and automatic sign-in
+
+5. **[Jest + ?]**
+    - **Purpose**: Conduct automated backend integration tests
+    - **Reason**:
  
 ### **4.5. Dependencies Diagram**
-![image info](./graphics/HighLevelDesign.png)
+![image info](./graphics/backendD.png)
 
-The dependency of Users on interfaces from other components is because user deletion. When a user gets deleted, Users have to notify all other modules to remove all notes, templates and workspaces associated only with the user being deleted and make the user no longer an active member of any workspace they were in.
+The dependency of Users on interfaces from other components is because user deletion. When a user gets deleted, Users have to notify all other modules to remove all notes, messages and workspaces associated only with the user being deleted and make the user no longer an active member of any workspace they were in.
 
 
 ### **4.6. Use Case Sequence Diagram (5 Most Major Use Cases)**
@@ -427,11 +436,9 @@ The dependency of Users on interfaces from other components is because user dele
 
 ### **4.7. Design and Ways to Test Non-Functional Requirements**
 1. [**[Feature Accessibility]**](#nfr1)
-    - **Validation**: If you are at the home screen, you can click on the workspaces icon on the bottom (4th from the left), then click the chat icon of any workspace to view messages.This meets the “two click” requirements that we had set before
-2. [**[Searching Speed]**](#nfr1)
-    - **Validation**: When searching for notes, it appeared almost instantly (<1 second) during our testing. We had created around 100 notes at this time, so it should still be <5 seconds even with over 500 notes
-2. [**[Filtering Speed]**](#nfr1)
-    - **Validation**: This yielded the same results as the searching speed. We created around 100 notes and tested many combinations of filters, and each time the results appeared almost instantly (<1 second)
+    - **Validation**: If you are at the home screen, you can click on the workspaces icon on the bottom (4th from the left), then click the chat icon of any workspace to view messages. This meets the “two click” requirements that we had set before. there is an automated frontend end-to-end test that cecks whether creation screen of personal workspace, personal chat, and content, create and chat screens of a workspace are reachable from the main screen within 2 clicks.
+2. [**[Searching Speed]**](#nfr2)
+    - **Validation**: A test workspace of 400 notes has been created. It has been verified with automated backend integration test that call the search endpoint produces a result in less than 4 seconds.
 
 
 
