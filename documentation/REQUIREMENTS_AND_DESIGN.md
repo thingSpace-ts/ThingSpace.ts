@@ -15,6 +15,7 @@
 | 25.10.2025 | All | Cleaned up doc and implemented feedback from M2 |
 | 26.10.2025 | 4.6 | Added sequence diagrams for components |
 | 10.11.2025 | 3.5, 3.7 | Revised the formal use case specifications to the state of the app in M4. This is to provide a reference for testing
+| 27.11.2025 | 3.* | Revised the entire requirement specification. This is first to resolve the dilema the croup had between copying notes and creating from template - now bothoptions are available. Create from template allows to create a note from template, Copy copies template as template and notes as notes. Secondly, since we do not work workspace manager to leave the workspace, we had to create two more actors for workspace member and workspace regular member and rework the inheritance between them. Formal use case specification changed so that every use case has separate error handling for client-side (user) errors, and server-side issues.
 ---
 
 
@@ -40,14 +41,13 @@ The target audience is the general public. If one has a large amount of differen
 
 ![image info](./graphics/UseCaseD.png)
 
-
 ### **3.3. Actors Description**
 1. **[User]**: The general user of the application. Can fully manage (CRUD + search + template creation)their own notes. Can join and create workspaces.
 2. **[Workspace Member]** - can contribute to workspaces they are in by sending notes and chat messages, as well as inviting new members.
 3. **[Workspace Manager]**: Inherits from User. Has additional options to update and delete the workspaces they own. Can also ban users from their workspace(s).
 4. **[Google OAuth API]**: External service used  for authentication.
 5. **[Open AI API]**: The role of the API would be to create vector embeddings for notes and search queries so that vector-based search algorithms, such as KNN, can be used. This is to enhance the search quality so that the user does not have to exactly match the text of the note in their prompt.
-5. **[Firebase Push Notification Service]**: Firebase handles the logic for sending push notifications. 
+5. **[Firebase PCloud Messaging]**: Firebase handles the logic for sending push notifications. 
 
 
 ### **3.4. Use Case Description**
@@ -75,7 +75,7 @@ The target audience is the general public. If one has a large amount of differen
 
 
 - Use cases for feature 4: Customize Format
-15. **Create Template**: A user can create a note template, consisting of components like title, tags, description(s), and custom fields like "Due date" for a note template. A note template can be created from an existing note or directly.
+15. **Create Template**: A user can create a note template, consisting of components like title, tags, and custom fields like "Due date" for a note template.
 16. **Update Template**: A user can update their templates, editing the components. 
 17. **Delete Template**: A user can delete their templates, and will not be able to use it for future notes. 
 
@@ -137,11 +137,13 @@ NOTES: 5 most major use cases
 1. User types in their query visible in the main screen or template screen
 2. User presses the "Search" button
 3. System sends query string to OpenAI API, which returns the vectorized query 
-4. System displays a list of notes, sorted by how much their vector embeddings match the one of the query.
+4. System displays a list of notes that match the current tag filter, sorted by how much their vector embeddings match the one of the query.
 
 **Failure scenario(s)**:
+- 3a. No notes to fetch (no notes in the workspace or no notes that pass the tag filter)
+    - 3a1. System does not display any notes
 - 3b. Available notes not fetched
-	- 4b1. System displays an error message stating the error code and reason the fetch failed, such as connection loss. 
+	- 3b1. System displays an error message stating the error code and reason the fetch failed, such as connection loss. 
 
 
 <a name="uc3"></a>
