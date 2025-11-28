@@ -6,7 +6,6 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { workspaceModel } from '../../workspaces/workspace.model';
 import { userModel } from '../../users/user.model';
 import { noteModel } from '../../notes/note.model';
-import { WorkspaceController } from '../../workspaces/workspace.controller';
 import { workspaceService } from '../../workspaces/workspace.service';
 import { NoteType } from '../../notes/notes.types';
 import { notificationService } from '../../notifications/notification.service';
@@ -245,30 +244,22 @@ describe('Workspace API – Normal Tests (No Mocking)', () => {
       expect(res.body.error).toContain('personal workspace');
     });
 
-    test('404 – controller surfaces "User not found" error from service', async () => {
-      // Input: controller invoked with req.user but service throws "User not found"
+    test('404 – API returns "User not found" when service throws (via mock)', async () => {
+      // Mocked behavior: workspaceService.getPersonalWorkspaceForUser throws "User not found"
+      // Input: authenticated request via API
       // Expected status code: 404
       // Expected behaviour: controller catches service error and returns 404 response
       // Expected output: JSON error "User not found"
-      const controller = new WorkspaceController();
-      const req = {
-        user: { _id: new mongoose.Types.ObjectId(testData.testUserId) },
-      } as unknown as import('express').Request;
-      const statusMock = jest.fn().mockReturnThis();
-      const jsonMock = jest.fn();
-      const res = {
-        status: statusMock,
-        json: jsonMock,
-      } as unknown as import('express').Response;
-
       const serviceSpy = jest
         .spyOn(workspaceService, 'getPersonalWorkspaceForUser')
         .mockRejectedValueOnce(new Error('User not found'));
 
-      await controller.getPersonalWorkspace(req, res);
+      const res = await request(app)
+        .get('/api/workspace/personal')
+        .set('Authorization', `Bearer ${testData.testUserToken}`);
 
-      expect(statusMock).toHaveBeenCalledWith(404);
-      expect(jsonMock).toHaveBeenCalledWith({ error: 'User not found' });
+      expect(res.status).toBe(404);
+      expect(res.body.error).toBe('User not found');
 
       serviceSpy.mockRestore();
     });

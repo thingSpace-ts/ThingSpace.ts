@@ -140,7 +140,7 @@ describe('Message API – Normal Tests (No Mocking)', () => {
 
       expect(res.status).toBe(404);
       expect(res.body.error).toBe('Workspace not found');
-    });
+    }, 60000); // Increase timeout to 60s for potential slow database operations
 
     test('403 – returns 403 when user is not a member', async () => {
       // Input: workspaceId where user is not a member

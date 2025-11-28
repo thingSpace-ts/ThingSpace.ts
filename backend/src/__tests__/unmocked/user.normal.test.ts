@@ -2,10 +2,13 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import fs from 'fs';
+import path from 'path';
 
 import { workspaceModel } from '../../workspaces/workspace.model';
 import { userModel } from '../../users/user.model';
 import { noteModel } from '../../notes/note.model';
+import { IMAGES_DIR } from '../../utils/constants';
 import { createTestApp, setupTestDatabase, TestData } from '../test-utils/test-helpers';
 
 // ---------------------------
@@ -239,6 +242,38 @@ describe('User API – Normal Tests (No Mocking)', () => {
       expect(res.body.message).toBe('User info updated successfully');
       expect(res.body.data.user).toBeDefined();
     });
+
+    test('500 – returns 500 on database error during update', async () => {
+      // Input: valid update request but database operation fails
+      // Expected status code: 500
+      // Expected behavior: auth middleware fails first when DB disconnected (userModel.findById)
+      // Expected output: error message "Internal server error" (from global error handler)
+      // Note: The actual model error handling is tested in user.mocked.test.ts
+      const updateData = {
+        profile: {
+          name: 'Updated Name',
+        },
+      };
+
+      const currentUri = mongo.getUri();
+      
+      // Disconnect database temporarily to trigger error
+      await mongoose.disconnect();
+      
+      try {
+        const res = await request(app)
+          .put('/api/user/profile')
+          .set('Authorization', `Bearer ${testData.testUserToken}`)
+          .send(updateData);
+
+        expect(res.status).toBe(500);
+        // Auth middleware fails first, error goes to global handler
+        expect(res.body.message).toBe('Internal server error');
+      } finally {
+        // Reconnect using the same Mongo instance
+        await mongoose.connect(currentUri);
+      }
+    });
   });
 
   describe('DELETE /api/user/profile - Delete Profile', () => {
@@ -316,6 +351,143 @@ describe('User API – Normal Tests (No Mocking)', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.message).toBe('User deleted successfully');
+    });
+
+    test('200 – deletes user and cleans up user images', async () => {
+      // Input: authenticated user deletion request
+      // Expected status code: 200
+      // Expected behavior: user deleted and mediaService.deleteAllUserImages called
+      // Expected output: success message and user images deleted
+      // This test verifies that media cleanup (mediaService.deleteAllUserImages) is triggered
+      // during user deletion (user.controller.ts line 82)
+      
+      // Ensure IMAGES_DIR exists
+      if (!fs.existsSync(IMAGES_DIR)) {
+        fs.mkdirSync(IMAGES_DIR, { recursive: true });
+      }
+
+      // Create test image files for this user
+      const userId = testData.testUserId;
+      const file1 = path.resolve(IMAGES_DIR, `${userId}-test1.png`);
+      const file2 = path.resolve(IMAGES_DIR, `${userId}-test2.png`);
+      const otherFile = path.resolve(IMAGES_DIR, 'other-user-test.png');
+
+      fs.writeFileSync(file1, Buffer.from('test1'));
+      fs.writeFileSync(file2, Buffer.from('test2'));
+      fs.writeFileSync(otherFile, Buffer.from('test3'));
+
+      // Verify files exist
+      expect(fs.existsSync(file1)).toBe(true);
+      expect(fs.existsSync(file2)).toBe(true);
+      expect(fs.existsSync(otherFile)).toBe(true);
+
+      const res = await request(app)
+        .delete('/api/user/profile')
+        .set('Authorization', `Bearer ${testData.testUserToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe('User deleted successfully');
+
+      // Verify user's image files are deleted
+      expect(fs.existsSync(file1)).toBe(false);
+      expect(fs.existsSync(file2)).toBe(false);
+      // Other user's file should remain
+      expect(fs.existsSync(otherFile)).toBe(true);
+
+      // Clean up remaining test file
+      if (fs.existsSync(otherFile)) {
+        fs.unlinkSync(otherFile);
+      }
+    });
+
+    test('200 – deletes user successfully when IMAGES_DIR does not exist', async () => {
+      // Input: authenticated user deletion request when IMAGES_DIR doesn't exist
+      // Expected status code: 200
+      // Expected behavior: user deleted, mediaService.deleteAllUserImages returns early (line 108-110)
+      // Expected output: success message, no crash despite missing directory
+      // This tests the defensive check in media.service.ts deleteAllUserImages()
+      
+      // Temporarily move IMAGES_DIR contents if it exists
+      const tempDir = IMAGES_DIR + '_temp_backup';
+      let dirExisted = false;
+      const savedFiles: string[] = [];
+      
+      if (fs.existsSync(IMAGES_DIR)) {
+        // Create temp directory
+        if (!fs.existsSync(tempDir)) {
+          fs.mkdirSync(tempDir, { recursive: true });
+        }
+        // Move all files from IMAGES_DIR to temp
+        const files = fs.readdirSync(IMAGES_DIR);
+        for (const file of files) {
+          const sourcePath = path.join(IMAGES_DIR, file);
+          const destPath = path.join(tempDir, file);
+          // Check if source file still exists before moving (may have been deleted by another test)
+          if (fs.existsSync(sourcePath)) {
+            fs.renameSync(sourcePath, destPath);
+            savedFiles.push(file);
+          }
+        }
+        dirExisted = true;
+        // Remove the now-empty IMAGES_DIR
+        fs.rmdirSync(IMAGES_DIR);
+      }
+
+      try {
+        const res = await request(app)
+          .delete('/api/user/profile')
+          .set('Authorization', `Bearer ${testData.testUserToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.message).toBe('User deleted successfully');
+
+        // Verify user is deleted even when image cleanup couldn't run
+        const deletedUser = await userModel.findById(new mongoose.Types.ObjectId(testData.testUserId));
+        expect(deletedUser).toBeNull();
+      } finally {
+        // Restore IMAGES_DIR
+        if (dirExisted && fs.existsSync(tempDir)) {
+          // Recreate IMAGES_DIR if it doesn't exist
+          if (!fs.existsSync(IMAGES_DIR)) {
+            fs.mkdirSync(IMAGES_DIR, { recursive: true });
+          }
+          // Move files back
+          for (const file of savedFiles) {
+            const sourcePath = path.join(tempDir, file);
+            const destPath = path.join(IMAGES_DIR, file);
+            if (fs.existsSync(sourcePath)) {
+              fs.renameSync(sourcePath, destPath);
+            }
+          }
+          // Remove temp directory (recursive)
+          fs.rmSync(tempDir, { recursive: true, force: true });
+        }
+      }
+    });
+
+    test('500 – returns 500 on database error during deletion', async () => {
+      // Input: valid delete request but database operation fails
+      // Expected status code: 500
+      // Expected behavior: auth middleware fails first when DB disconnected
+      // Expected output: error message "Internal server error" (from global error handler)
+      // Note: The actual model error handling is tested in user.mocked.test.ts
+      const currentUri = mongo.getUri();
+      
+      // Disconnect database temporarily to trigger error
+      await mongoose.disconnect();
+      
+      try {
+        const res = await request(app)
+          .delete('/api/user/profile')
+          .set('Authorization', `Bearer ${testData.testUserToken}`);
+
+        expect(res.status).toBe(500);
+        // Auth middleware fails first, error goes to global handler
+        expect(res.body.message).toBe('Internal server error');
+      } finally {
+        // Reconnect using the same Mongo instance
+        await mongoose.connect(currentUri);
+      }
     });
   });
 
@@ -423,6 +595,36 @@ describe('User API – Normal Tests (No Mocking)', () => {
       expect(res.body.error).toBe('User not found');
       expect(res.body.message).toBe('Token is valid but user no longer exists');
     });
+
+    test('500 – returns 500 on database error during FCM token update', async () => {
+      // Input: valid FCM token update request but database operation fails
+      // Expected status code: 500
+      // Expected behavior: auth middleware fails first when DB disconnected
+      // Expected output: error message "Internal server error" (from global error handler)
+      // Note: The actual model error handling is tested in user.mocked.test.ts
+      const updateData = {
+        fcmToken: 'new-fcm-token-123',
+      };
+
+      const currentUri = mongo.getUri();
+      
+      // Disconnect database temporarily to trigger error
+      await mongoose.disconnect();
+      
+      try {
+        const res = await request(app)
+          .post('/api/user/fcm-token')
+          .set('Authorization', `Bearer ${testData.testUserToken}`)
+          .send(updateData);
+
+        expect(res.status).toBe(500);
+        // Auth middleware fails first, error goes to global handler
+        expect(res.body.message).toBe('Internal server error');
+      } finally {
+        // Reconnect using the same Mongo instance
+        await mongoose.connect(currentUri);
+      }
+    });
   });
 
   describe('GET /api/user/:id - Get User By ID', () => {
@@ -467,6 +669,31 @@ describe('User API – Normal Tests (No Mocking)', () => {
 
       expect(res.status).toBe(404);
       expect(res.body.message).toBe('User not found');
+    });
+
+    test('500 – returns 500 on database error during findById', async () => {
+      // Input: valid user ID but database operation fails
+      // Expected status code: 500
+      // Expected behavior: auth middleware fails first when DB disconnected
+      // Expected output: error message "Internal server error" (from global error handler)
+      // Note: The actual model error handling is tested in user.mocked.test.ts
+      const currentUri = mongo.getUri();
+      
+      // Disconnect database temporarily to trigger error
+      await mongoose.disconnect();
+      
+      try {
+        const res = await request(app)
+          .get(`/api/user/${testData.testUserId}`)
+          .set('Authorization', `Bearer ${testData.testUserToken}`);
+
+        expect(res.status).toBe(500);
+        // Auth middleware fails first, error goes to global handler
+        expect(res.body.message).toBe('Internal server error');
+      } finally {
+        // Reconnect using the same Mongo instance
+        await mongoose.connect(currentUri);
+      }
     });
   });
 
@@ -535,100 +762,26 @@ describe('User API – Normal Tests (No Mocking)', () => {
       expect(res.status).toBe(404);
       expect(res.body.message).toBe('User not found');
     });
-  });
 
-  describe('User Model Error Branches - Direct Model Tests', () => {
-    beforeEach(async () => {
-      // Ensure database is connected before each test in this describe block
-      if (mongoose.connection.readyState === 0) {
-        await mongoose.connect(mongo.getUri());
-      }
-    });
-
-    afterEach(async () => {
-      // Ensure database is reconnected after each test
-      if (mongoose.connection.readyState === 0) {
-        await mongoose.connect(mongo.getUri());
-      }
-    });
-
-    test('create throws ZodError on invalid data (ZodError branch)', async () => {
-      // Input: invalid user data that fails schema validation (tests user.model.ts lines 85-87)
-      // Expected behavior: ZodError caught and re-thrown as "Invalid update data"
-      // Expected output: Error with message "Invalid update data"
-      const invalidUserInfo = {
-        googleId: 'test-google-id',
-        email: 'invalid-email', // Invalid email format
-        name: 'Test User',
-        profilePicture: '',
-      };
-
-      await expect(
-        userModel.create(invalidUserInfo)
-      ).rejects.toThrow('Invalid update data');
-    });
-
-    test('create throws error on database error (generic error branch)', async () => {
-      // Input: valid user data but database operation fails (tests user.model.ts lines 89-90)
-      // Expected behavior: Error caught and re-thrown as "Failed to update user"
-      // Expected output: Error with message "Failed to update user"
-      const validUserInfo = {
-        googleId: 'test-google-id-2',
-        email: 'test@example.com',
-        name: 'Test User',
-        profilePicture: '',
-      };
+    test('500 – returns 500 on database error during findByEmail', async () => {
+      // Input: valid email but database operation fails
+      // Expected status code: 500
+      // Expected behavior: auth middleware fails first when DB disconnected
+      // Expected output: error message "Internal server error" (from global error handler)
+      // Note: The actual model error handling is tested in user.mocked.test.ts
       const currentUri = mongo.getUri();
       
       // Disconnect database temporarily to trigger error
       await mongoose.disconnect();
       
       try {
-        await expect(
-          userModel.create(validUserInfo)
-        ).rejects.toThrow('Failed to update user');
-      } finally {
-        // Reconnect using the same Mongo instance
-        await mongoose.connect(currentUri);
-      }
-    });
+        const res = await request(app)
+          .get('/api/user/email/testuser1@example.com')
+          .set('Authorization', `Bearer ${testData.testUserToken}`);
 
-    test('updateFcmToken throws error on database error', async () => {
-      // Input: database operation that fails
-      // Expected behavior: Error caught and re-thrown (lines 187-190)
-      // Expected output: Error with message "Failed to update FCM token"
-      const userId = new mongoose.Types.ObjectId(testData.testUserId);
-      const fcmToken = 'test-fcm-token';
-      const currentUri = mongo.getUri();
-      
-      // Disconnect database temporarily to trigger error
-      await mongoose.disconnect();
-      
-      try {
-        await expect(
-          userModel.updateFcmToken(userId, fcmToken)
-        ).rejects.toThrow('Failed to update FCM token');
-      } finally {
-        // Reconnect using the same Mongo instance
-        await mongoose.connect(currentUri);
-      }
-    });
-
-    test('updatePersonalWorkspace throws error on database error', async () => {
-      // Input: database operation that fails
-      // Expected behavior: Error caught and re-thrown (lines 204-207)
-      // Expected output: Error with message "Failed to update personal workspace"
-      const userId = new mongoose.Types.ObjectId(testData.testUserId);
-      const workspaceId = new mongoose.Types.ObjectId(testData.testWorkspaceId);
-      const currentUri = mongo.getUri();
-      
-      // Disconnect database temporarily to trigger error
-      await mongoose.disconnect();
-      
-      try {
-        await expect(
-          userModel.updatePersonalWorkspace(userId, workspaceId)
-        ).rejects.toThrow('Failed to update personal workspace');
+        expect(res.status).toBe(500);
+        // Auth middleware fails first, error goes to global handler
+        expect(res.body.message).toBe('Internal server error');
       } finally {
         // Reconnect using the same Mongo instance
         await mongoose.connect(currentUri);

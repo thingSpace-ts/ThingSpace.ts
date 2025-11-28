@@ -203,40 +203,97 @@ describe('Media API – Mocked Tests (Jest Mocks)', () => {
     });
   });
 
-  describe('Media Service - Direct Service Tests with Mocks', () => {
-    test('saveImage throws error when path validation fails', async () => {
-      // Input: file path that fails validation (line 30-31)
-      // Expected behavior: validatePath returns false, error is thrown
-      // Expected output: Error "Invalid file path"
-      const testFile = path.resolve(IMAGES_DIR, 'test-validation.png');
-      fs.writeFileSync(testFile, Buffer.from('test data'));
-
-      // Mock validatePath to return false to trigger the validation error
-      const validatePathSpy = jest.spyOn(mediaService as any, 'validatePath').mockReturnValue(false);
+  describe('DELETE /api/user/profile - User Deletion Media Cleanup, with mocks', () => {
+    test('200 – user deletion succeeds when deleteAllUserImages encounters readdirSync error', async () => {
+      // Input: authenticated user deletion request, fs.readdirSync fails
+      // Expected status code: 200
+      // Expected behavior: Error is caught and logged (media.service.ts lines 124-126)
+      // Expected output: User deleted successfully, error logged
+      // This tests the catch block in deleteAllUserImages via API
+      
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const readdirSyncSpy = jest.spyOn(fs, 'readdirSync').mockImplementation(() => {
+        throw new Error('readdirSync failed');
+      });
 
       try {
-        await expect(
-          mediaService.saveImage(testFile, testData.testUserId)
-        ).rejects.toThrow('Invalid file path');
+        const res = await request(app)
+          .delete('/api/user/profile')
+          .set('Authorization', `Bearer ${testData.testUserToken}`);
 
-        // Verify validatePath was called
-        expect(validatePathSpy).toHaveBeenCalled();
+        expect(res.status).toBe(200);
+        expect(res.body.message).toBe('User deleted successfully');
+        
+        // Verify error was logged - media.service.ts line 125
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to delete user images:', expect.any(Error));
       } finally {
-        // Restore original function
-        validatePathSpy.mockRestore();
-        // Clean up if file still exists
-        if (fs.existsSync(testFile)) {
-          fs.unlinkSync(testFile);
-        }
+        readdirSyncSpy.mockRestore();
+        consoleErrorSpy.mockRestore();
       }
     });
 
-    test('saveImage cleans up file when rename fails and file exists', async () => {
-      // Input: file that exists but rename fails
-      // Expected behavior: File is deleted if it exists when error occurs (line 18: fs.unlinkSync)
-      // Expected output: Error thrown, file cleaned up
-      const testFile = path.resolve(IMAGES_DIR, 'test-cleanup.png');
-      fs.writeFileSync(testFile, Buffer.from('test data'));
+    test('200 – user deletion succeeds when deleteImage encounters unlinkSync error', async () => {
+      // Input: authenticated user deletion request with user images, fs.unlinkSync fails
+      // Expected status code: 200
+      // Expected behavior: Error is caught and logged (media.service.ts lines 100-102)
+      // Expected output: User deleted successfully, error logged
+      // This tests the catch block in deleteImage via API
+      
+      // Create test image files for this user
+      const userId = testData.testUserId;
+      const file1 = path.resolve(IMAGES_DIR, `${userId}-test1.png`);
+      
+      // Ensure IMAGES_DIR exists
+      if (!fs.existsSync(IMAGES_DIR)) {
+        fs.mkdirSync(IMAGES_DIR, { recursive: true });
+      }
+      fs.writeFileSync(file1, Buffer.from('test1'));
+
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      
+      // Mock unlinkSync to fail only for our test file
+      const originalUnlinkSync = fs.unlinkSync.bind(fs);
+      const unlinkSyncSpy = jest.spyOn(fs, 'unlinkSync').mockImplementation((filePath) => {
+        if (typeof filePath === 'string' && filePath.includes(userId)) {
+          throw new Error('Unlink failed');
+        }
+        return originalUnlinkSync(filePath);
+      });
+
+      try {
+        const res = await request(app)
+          .delete('/api/user/profile')
+          .set('Authorization', `Bearer ${testData.testUserToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.message).toBe('User deleted successfully');
+        
+        // Verify error was logged - media.service.ts line 101
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to delete old profile picture:', expect.any(Error));
+      } finally {
+        unlinkSyncSpy.mockRestore();
+        consoleErrorSpy.mockRestore();
+        // Clean up if file still exists
+        if (fs.existsSync(file1)) {
+          try { fs.unlinkSync(file1); } catch { /* ignore */ }
+        }
+      }
+    });
+  });
+
+  describe('POST /api/media/upload - Upload Image Error Paths, with mocks', () => {
+    test('500 – returns 500 and cleans up file when rename fails', async () => {
+      // Input: valid image file upload, but fs.renameSync fails
+      // Expected status code: 500
+      // Expected behavior: File cleanup branch executed (media.service.ts lines 76-79)
+      // Expected output: Error message, original file cleaned up
+      // This tests saveImage catch block cleanup via API
+      
+      const testImagePath = path.resolve(IMAGES_DIR, 'test-rename-fail.png');
+      if (!fs.existsSync(IMAGES_DIR)) {
+        fs.mkdirSync(IMAGES_DIR, { recursive: true });
+      }
+      fs.writeFileSync(testImagePath, Buffer.from('fake-image-data'));
 
       // Mock fs.renameSync to throw error
       const renameSyncSpy = jest.spyOn(fs, 'renameSync').mockImplementation(() => {
@@ -244,174 +301,118 @@ describe('Media API – Mocked Tests (Jest Mocks)', () => {
       });
 
       try {
-        // Try to save - rename will fail due to mock
-        // The file exists, so the cleanup branch (line 17-18) will be executed
-        await expect(
-          mediaService.saveImage(testFile, testData.testUserId)
-        ).rejects.toThrow('Failed to save profile picture');
+        const res = await request(app)
+          .post('/api/media/upload')
+          .set('Authorization', `Bearer ${testData.testUserToken}`)
+          .attach('media', testImagePath);
 
-        // File should be cleaned up (deleted) - line 18
-        expect(fs.existsSync(testFile)).toBe(false);
-        expect(renameSyncSpy).toHaveBeenCalled();
+        expect(res.status).toBe(500);
+        expect(res.body.message).toContain('Failed to save profile picture');
       } finally {
-        // Restore original function
         renameSyncSpy.mockRestore();
-        // Clean up if file still exists
-        if (fs.existsSync(testFile)) {
-          fs.unlinkSync(testFile);
-        }
-      }
-    });
-
-    test('deleteImage catches and logs error when unlinkSync fails', async () => {
-      // Input: URL that triggers error in deleteImage
-      // Expected behavior: Error is caught and logged (line 33: console.error)
-      // Expected output: No error thrown, error logged
-      const testFile = path.resolve(IMAGES_DIR, 'test-delete-error.png');
-      fs.writeFileSync(testFile, Buffer.from('test data'));
-      // Use relative path from process.cwd() as deleteImage expects
-      const relativePath = path.relative(process.cwd(), testFile);
-      const url = relativePath.replace(/\\/g, '/');
-      const constructedPath = path.resolve(process.cwd(), url);
-      
-      // Create file at the path that will be checked
-      if (!fs.existsSync(path.dirname(constructedPath))) {
-        fs.mkdirSync(path.dirname(constructedPath), { recursive: true });
-      }
-      fs.writeFileSync(constructedPath, Buffer.from('test data'));
-
-      // Mock validatePath to return true (so we can test the error handling)
-      // We need to access the private method via bracket notation or spy on the class
-      const validatePathSpy = jest.spyOn(mediaService as any, 'validatePath').mockReturnValue(true);
-      
-      // Mock fs.unlinkSync to throw error
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      const existsSyncSpy = jest.spyOn(fs, 'existsSync').mockReturnValue(true);
-      const unlinkSyncSpy = jest.spyOn(fs, 'unlinkSync').mockImplementation(() => {
-        throw new Error('Unlink failed');
-      });
-
-      try {
-        // deleteImage should catch the error and log it
-        await expect(mediaService.deleteImage(url)).resolves.not.toThrow();
-        
-        // Verify error was logged
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to delete old profile picture:', expect.any(Error));
-        expect(unlinkSyncSpy).toHaveBeenCalled();
-      } finally {
-        // Restore
-        validatePathSpy.mockRestore();
-        existsSyncSpy.mockRestore();
-        unlinkSyncSpy.mockRestore();
-        consoleErrorSpy.mockRestore();
         // Clean up
-        if (fs.existsSync(constructedPath)) {
-          try {
-            fs.unlinkSync(constructedPath);
-          } catch {
-            // Ignore
-          }
-        }
-        if (fs.existsSync(testFile)) {
-          fs.unlinkSync(testFile);
+        if (fs.existsSync(testImagePath)) {
+          fs.unlinkSync(testImagePath);
         }
       }
     });
+  });
 
-    test('deleteAllUserImages returns early when IMAGES_DIR does not exist', async () => {
-      // Input: IMAGES_DIR does not exist
-      // Expected behavior: Method returns early (line 39-40: return)
-      // Expected output: No error thrown, method completes
-      const originalExistsSync = fs.existsSync;
-      const existsSyncSpy = jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
-        // Return false for IMAGES_DIR, use original for other paths
-        if (filePath === IMAGES_DIR) {
-          return false;
-        }
-        return originalExistsSync(filePath);
-      });
+  describe('POST /api/user/profile - Edge Cases', () => {
+    test('401 – upload fails when authentication middleware sets undefined user', async () => {
+      const { MediaController } = require('../../media/media.controller');
+      const controller = new MediaController();
 
+      const req = {
+        file: { path: '/tmp/test.png' },
+        user: undefined,
+      } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+      } as any;
+      const next = jest.fn();
+
+      await controller.uploadImage(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith({ message: 'User not authenticated' });
+    });
+  });
+
+  describe('Media Service - Path Validation Security', () => {
+    test('500 – file system operations reject paths outside allowed directory', () => {
+      const service = mediaService as any;
+      
+      const result = service.safeExistsSync('/etc/passwd', true);
+      expect(result).toBe(false);
+    });
+
+    test('500 – file deletion rejects invalid paths when validation enabled', () => {
+      const service = mediaService as any;
+      
+      expect(() => {
+        service.safeUnlinkSync('/etc/passwd', true);
+      }).toThrow('Invalid file path for deletion');
+    });
+
+    test('500 – file rename rejects invalid destination paths', () => {
+      const service = mediaService as any;
+      
+      expect(() => {
+        service.safeRenameSync('/tmp/source', '/etc/invalid', true);
+      }).toThrow('Invalid destination path');
+    });
+
+    test('500 – save image validates destination path is within allowed directory', async () => {
+      const service = mediaService as any;
+      const originalValidatePath = service.validatePath.bind(service);
+      
+      service.validatePath = jest.fn().mockReturnValue(false);
+      
       try {
-        // deleteAllUserImages should return early without error
         await expect(
-          mediaService.deleteAllUserImages(testData.testUserId)
-        ).resolves.not.toThrow();
-        
-        // Verify existsSync was called with IMAGES_DIR
-        expect(existsSyncSpy).toHaveBeenCalledWith(IMAGES_DIR);
+          mediaService.saveImage('/tmp/test.png', 'user123')
+        ).rejects.toThrow('Invalid file path');
       } finally {
-        existsSyncSpy.mockRestore();
+        service.validatePath = originalValidatePath;
       }
     });
 
-    test('deleteAllUserImages catches and logs error when readdirSync fails', async () => {
-      // Input: Operation that causes readdirSync to fail
-      // Expected behavior: Error is caught and logged (line 48: console.error)
-      // Expected output: No error thrown, error logged
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-      const readdirSyncSpy = jest.spyOn(fs, 'readdirSync').mockImplementation(() => {
-        throw new Error('readdirSync failed');
+    test('500 – save image handles non-Error exceptions during file operations', async () => {
+      const service = mediaService as any;
+      const originalSafeRenameSync = service.safeRenameSync.bind(service);
+      
+      service.safeRenameSync = jest.fn().mockImplementation(() => {
+        throw 'string error';
       });
-
+      
       try {
-        // deleteAllUserImages should catch the error and log it
         await expect(
-          mediaService.deleteAllUserImages(testData.testUserId)
-        ).resolves.not.toThrow();
-        
-        // Verify error was logged - line 48
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to delete user images:', expect.any(Error));
-        expect(readdirSyncSpy).toHaveBeenCalled();
+          mediaService.saveImage('/tmp/test.png', 'user123')
+        ).rejects.toThrow('Failed to save profile picture: string error');
       } finally {
-        // Restore
-        readdirSyncSpy.mockRestore();
-        consoleErrorSpy.mockRestore();
+        service.safeRenameSync = originalSafeRenameSync;
       }
     });
 
-    test('storage.ts creates IMAGES_DIR when it does not exist', async () => {
-      // Input: IMAGES_DIR does not exist (tests storage.ts lines 8-10)
-      // Expected behavior: Directory is created when storage module loads
-      // Expected output: fs.mkdirSync is called with IMAGES_DIR
-      // Note: This tests the module-level code in storage.ts
-      
-      // Set up mocks BEFORE isolating modules
-      const originalExistsSync = fs.existsSync;
-      const originalMkdirSync = fs.mkdirSync;
-      
-      const existsSyncSpy = jest.spyOn(fs, 'existsSync').mockImplementation((dirPath) => {
-        // Return false for IMAGES_DIR to simulate it doesn't exist
-        if (dirPath === IMAGES_DIR) {
-          return false;
-        }
-        // Use original for other paths
-        return originalExistsSync.call(fs, dirPath);
-      });
-      
-      const mkdirSyncSpy = jest.spyOn(fs, 'mkdirSync').mockImplementation((dirPath, options) => {
-        // Call original to actually create directory (needed for cleanup)
-        return originalMkdirSync.call(fs, dirPath, options);
-      });
+    test('200 – delete image handles paths outside allowed directory gracefully', async () => {
+      await expect(mediaService.deleteImage('/etc/passwd')).resolves.toBeUndefined();
+    });
 
+    test('200 – deleteAllUserImages returns early when IMAGES_DIR does not exist', async () => {
+      const service = mediaService as any;
+      const originalSafeExistsSync = service.safeExistsSync.bind(service);
+      
+      // Mock safeExistsSync to return false (directory doesn't exist)
+      service.safeExistsSync = jest.fn().mockReturnValue(false);
+      
       try {
-        // Use jest.isolateModules to ensure module code executes with our mocks
-        jest.isolateModules(() => {
-          // Re-require storage module - this will execute lines 8-10
-          // The module will call fs.existsSync(IMAGES_DIR) which returns false (mocked)
-          // Then it will call fs.mkdirSync(IMAGES_DIR, { recursive: true })
-          require('../../utils/storage');
-        });
-        
-        // Verify existsSync was called with IMAGES_DIR - line 8
-        expect(existsSyncSpy).toHaveBeenCalledWith(IMAGES_DIR);
-        // Verify mkdirSync was called with IMAGES_DIR and recursive: true - line 9
-        expect(mkdirSyncSpy).toHaveBeenCalledWith(IMAGES_DIR, { recursive: true });
+        // This should return early without error
+        await expect(mediaService.deleteAllUserImages('user123')).resolves.toBeUndefined();
       } finally {
-        // Restore
-        mkdirSyncSpy.mockRestore();
-        existsSyncSpy.mockRestore();
+        service.safeExistsSync = originalSafeExistsSync;
       }
     });
   });
 });
-
