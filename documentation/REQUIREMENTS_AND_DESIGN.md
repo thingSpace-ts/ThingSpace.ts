@@ -77,9 +77,9 @@ The target audience is the general public. If one has a large amount of differen
 
 
 - Use cases for feature 4: Customize Format
-16. **Create Template**: A user can create a note template, consisting of components like title, tags, and custom fields like "Due date" for a note template.
-17. **Update Template**: A user can update their templates, editing the components. 
-18. **Delete Template**: A user can delete their templates, and will not be able to use it for future notes. 
+16. **Create Note Template**: A user can create a note template, consisting of components like title, tags, and custom fields like "Due date" for a note template.
+17. **Update Note Template**: A user can update their templates, editing the components. 
+18. **Delete Note Template**: A user can delete their templates, and will not be able to use it for future notes. 
 
 - In addition to that: sign up, sign in, sign out and delete account use cases from M1.
 
@@ -98,7 +98,7 @@ NOTES: 5 most major use cases
 - Send chat message 
 
 
-#### Use Case 1: [Create a Note]
+#### Use Case 1: [Create Note]
 
 
 **Description**: App user is logged in and creates notes by filling the default empty template, adding or removing fields if necessary. When the note is created, it is automatically stored in the workspace the user clicked the create note button in.
@@ -109,18 +109,20 @@ NOTES: 5 most major use cases
 **Main success scenario**:
 1. User presses the Create icon button.
 2. System displays the creation screen.
-3. User presses the Create a blank template button button, or click on one of the available templates.
-4. System displays the note creation screen, set to template mode: With a title field, tag field and a button to add content fields. If user selected a template, fields contained by the template appear, with label set to what is in the template and with content ready to be filled in.
-5. User customizes the note template to their desire by adding/removing/setting the content of the input fields around the space available. The tag and title fields are not removable.
+3. User presses the Create a blank note button button, or click on one of the available templates.
+4. System displays the note creation screen, set to note mode: With a title field, tag field and a button to add content fields. If user selected a template, fields contained by the template appear, with label set to what is in the template and with content ready to be filled in.
+5. User customizes the note to their desire by adding/removing/setting the content of the input fields around the space available. The tag and title fields are not removable.
 6. User clicks the “Create” confirmation button
-7. System saves the note template and navigates back to the note screen where the created note is visible
+7. System saves the note and navigates back to the note screen where the created note is visible
 
 
 **Failure scenario(s)**:
+- 4a. The loading of the note template failed
+    - 4a1. A not pre-filled creation screen opens with a relevant error messsage.
 - 7a. The note could not be created (client side, missing inputs)
     - 7a1. System displays a warning message prompting the user to at least create one field, add at least one tag, or set the title, depending on which of the three is missing
-- 7a. The note could not be created (server side)
-    - 7a1. System displays error message stating that the note could not be created as well as the reason for the failure (e.g. connection lost)
+- 7b. The note could not be created (server side)
+    - 7b1. System displays error message stating that the note could not be created as well as the reason for the failure (e.g. connection lost)
 
 
 
@@ -150,7 +152,7 @@ NOTES: 5 most major use cases
 <a name="uc3"></a>
 
 
-#### Use Case 3: [Create A Note Template]
+#### Use Case 3: [Create Note Template]
 
 
 **Description**: The user creates a note template by adding and deleting components to their desire (e.g. text field, date field, signature field).
