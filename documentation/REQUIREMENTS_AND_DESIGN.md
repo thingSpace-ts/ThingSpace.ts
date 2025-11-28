@@ -510,7 +510,7 @@ NOTES: 5 most major use cases
 ### **4.4. Frameworks and Libraries**
 1. **[Firebase Cloud Messaging]**
     - **Purpose**: Push notification support
-    - **Reason**: Provides routing, middleware, request handling, and all relevant backend API logic
+    - **Reason**: Reliable cross platform push notification delivery with easy integration for mobile and web clients
   
 2. **[Express.js]**
     - **Purpose**: Web framework for building REST apis
