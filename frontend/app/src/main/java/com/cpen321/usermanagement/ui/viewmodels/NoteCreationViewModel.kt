@@ -107,6 +107,9 @@ class NoteCreationViewModel @Inject constructor(
                     tags = note.tags
                 )
             }
+            else{
+                _creationState.value = _creationState.value.copy(error = "Could not load template.")
+            }
         }
     }
 
