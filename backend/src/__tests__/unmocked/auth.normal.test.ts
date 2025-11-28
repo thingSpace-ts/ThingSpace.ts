@@ -230,7 +230,7 @@ describe('Auth API – Normal Tests (No Mocking)', () => {
     });
   });
 
-  describe('Auth Service Error Branches - Direct Service Tests', () => {
+  describe('POST /api/auth/dev-login - Database Error via API', () => {
     beforeEach(async () => {
       // Ensure database is connected before each test in this describe block
       if (mongoose.connection.readyState === 0 && mongo) {
@@ -245,10 +245,11 @@ describe('Auth API – Normal Tests (No Mocking)', () => {
       }
     });
 
-    test('devLogin throws error on database error', async () => {
+    test('500 – dev-login returns error when database is disconnected', async () => {
       // Input: database operation that fails
-      // Expected behavior: Error caught and re-thrown
-      // Expected output: Error with message
+      // Expected status code: 500
+      // Expected behavior: Error caught by controller/middleware
+      // Expected output: Internal server error (global error handler)
       if (!mongo) {
         throw new Error('MongoDB Memory Server not initialized');
       }
@@ -258,9 +259,12 @@ describe('Auth API – Normal Tests (No Mocking)', () => {
       await mongoose.disconnect();
       
       try {
-        await expect(
-          authService.devLogin('test@example.com')
-        ).rejects.toThrow();
+        const res = await request(app)
+          .post('/api/auth/dev-login')
+          .send({ email: 'test-db-error@example.com' });
+
+        expect(res.status).toBe(500);
+        expect(res.body.message).toBe('Internal server error');
       } finally {
         // Reconnect using the same Mongo instance
         await mongoose.connect(currentUri);

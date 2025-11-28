@@ -434,8 +434,6 @@ describe('Notes API – Mocked Tests (Jest Mocks)', () => {
       });
       
       // Test 1: Normal query embedding (covers normal cosine similarity calculation)
-      (noteService as any).client = null;
-      
       const mockClient1 = {
         embeddings: {
           create: jest.fn().mockResolvedValueOnce({
@@ -444,7 +442,9 @@ describe('Notes API – Mocked Tests (Jest Mocks)', () => {
         },
       };
       
-      jest.spyOn(noteService as any, 'getClient').mockReturnValue(mockClient1);
+      // Mock getClient BEFORE resetting client to ensure mock is in place
+      const getClientSpy1 = jest.spyOn(noteService as any, 'getClient').mockReturnValue(mockClient1);
+      (noteService as any).client = null;
 
       const res1 = await request(app)
         .get('/api/notes')
@@ -466,6 +466,9 @@ describe('Notes API – Mocked Tests (Jest Mocks)', () => {
         input: "test query",
       });
 
+      // Restore the spy before next test
+      getClientSpy1.mockRestore();
+
       // Test 2: Empty query embedding (covers len === 0 check in cosineSimilarity)
       // Create a note with vectorData to test the empty query embedding scenario
       await noteModel.create({
@@ -476,8 +479,6 @@ describe('Notes API – Mocked Tests (Jest Mocks)', () => {
         fields: [{ fieldType: 'title', content: 'Empty Query Test', _id: '6' }],
         vectorData: [0.1, 0.2, 0.3, 0.4, 0.5],
       });
-
-      (noteService as any).client = null;
       
       const mockClient2 = {
         embeddings: {
@@ -487,7 +488,9 @@ describe('Notes API – Mocked Tests (Jest Mocks)', () => {
         },
       };
       
-      jest.spyOn(noteService as any, 'getClient').mockReturnValue(mockClient2);
+      // Mock getClient BEFORE resetting client
+      const getClientSpy2 = jest.spyOn(noteService as any, 'getClient').mockReturnValue(mockClient2);
+      (noteService as any).client = null;
 
       const res2 = await request(app)
         .get('/api/notes')
@@ -506,6 +509,9 @@ describe('Notes API – Mocked Tests (Jest Mocks)', () => {
         model: "text-embedding-3-large",
         input: "empty embedding test",
       });
+      
+      // Restore the spy
+      getClientSpy2.mockRestore();
     });
 
     test('500 – find notes handles non-Error thrown value', async () => {
