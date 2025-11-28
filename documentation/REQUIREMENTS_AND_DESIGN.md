@@ -24,14 +24,14 @@
 
 In short, we are aiming to create an application that would allow
 users to store all their (non-sensitive) information in one place and in a way that is easy to update, access and search. The app itself would not incorporate dedicated features such as notes, todo-lists etc. Instead one would be able to store information in a general note, which would be composed of numerous input fields: text, datetime etc. Users will be able to create templates for their own formats of notes and join workspaces where they can create notes that will be shared with other users.
-The target audience is the general public. If one has a large amount of different kinds of notes, todos or saved locations, they can use this app as a "general memory system" providing them one place to retrieve and update their entire collection of notes. However, we are especially aiming for groups of people who want to collaborate on their goal and manage this collaboration in one place and in a very customised manner. Existing apps do not fully provide such functionality (Notion: missing todos/notifications/chat, WhatsApp: files stored on everyone's machines, not able to see history prior to joining the communities, Discord: file sharing limit, Facebook: membership limits)
+The target audience is the general public. If one has a large amount of different kinds of notes, todos etc., they can use this app as a "general memory system" providing them one place to retrieve and update their entire collection of notes. However, we are especially aiming for groups of people who want to collaborate on their goal and manage this collaboration in one place and in a very customised manner. Existing apps do not fully provide such functionality (Notion: missing todos/notifications/chat, WhatsApp: files stored on everyone's machines, not able to see history prior to joining the communities, Discord: file sharing limit, Facebook: membership limits)
 
 
 ## 3. Requirements Specification
 
 
 ### **3.1. List of Features**
-1. **[Manage Notes]**: A user can create, update, read and delete their own notes as well as move them to other workspaces for other people to see
+1. **[Manage Notes]**: A user can create, update, read, copy and delete their own notes as well as move them to other workspaces for other people to see
 2. **[Retrieve Notes]**: A user can search through their notes and filter through the notes they see by their tags. The searching will be semantic, which means cases when the user does not type exactly the content of the note would be handled and the note will still be displayed.
 3. **[Collaborate]**: A User can create workspaces in which case they become their managers. Inside a workspace, notes can be posted and an associated chat can be used. The owner is able to invite people to the workspace by an email address, and a push notification will be sent to those invited notifying them. Notes in the workspace are visible to all Users who accepted the invitation. Naturally, the manager can update their workspace, or even delete it, as well as ban certain users.
 4. **[Customize Format]**: Users would be able create and manage their own formats of notes, known as templates. These can include any combination of text, signature and date fields, with the condition of at least one field, one tag and a title. They are then able to use the templates to make notes with a pre-created layout of fields.
@@ -42,11 +42,11 @@ The target audience is the general public. If one has a large amount of differen
 ![image info](./graphics/UseCaseD.png)
 
 ### **3.3. Actors Description**
-1. **[User]**: The general user of the application. Can fully manage (CRUD + search + template creation)their own notes. Can join and create workspaces.
+1. **[User]**: The general user of the application. Can fully manage (CRUD + search + template creation) their own notes. Can join and create workspaces.
 2. **[Workspace Member]** - can contribute to workspaces they are in by sending notes and chat messages, as well as inviting new members.
 3. **[Regular Member]** - inherits from Workspace Member. Can leave workspace.
 4. **[Workspace Manager]**: Inherits from Workspace Member. Has additional options to update and delete the workspaces they own. Can also ban users from their workspace(s).
-5. **[Google OAuth API]**: External service used  for authentication.
+5. **[Google OAuth API]**: External service used for authentication.
 6. **[Open AI API]**: The role of the API would be to create vector embeddings for notes and search queries so that vector-based search algorithms, such as KNN, can be used. This is to enhance the search quality so that the user does not have to exactly match the text of the note in their prompt.
 7. **[Firebase Cloud Messaging]**: Firebase handles the logic for sending push notifications. 
 
@@ -57,7 +57,7 @@ The target audience is the general public. If one has a large amount of differen
 2. **Update Note**: Users can update their notes and change the title, description, and other data. 
 3. **Move Note**: Users can move a note to a selected workspace.
 4. **Delete Note**: Users can delete a selected note.
-5. **Copy Note**: Users can copy a note to a selected workspace, creating a clone of it in the workspace and keeping the original one in the original workspace.
+5. **Copy Note**: Users can copy a note to a selected workspace, creating a clone of it in the target workspace and keeping the original one in the original workspace.
 
 
 - Use cases for feature 2: Retrieve Notes
@@ -73,12 +73,12 @@ The target audience is the general public. If one has a large amount of differen
 12. **Update Workspace**: The workspace manager can update workspace metadata, like title, descriptions, etc. 
 13. **Leave Workspace**: A user can leave any workspace that they are part of.
 14. **Delete Workspace**: The workspace manager can delete the workspace and all associated data.
-15. **Ban users**: The workspace owner can ban a user, kicking them out and preventing them from joining in the future. 
+15. **Ban users**: The workspace manager can ban a user, kicking them out and preventing them from joining in the future. 
 
 
 - Use cases for feature 4: Customize Format
 16. **Create Note Template**: A user can create a note template, consisting of components like title, tags, and custom fields like "Due date" for a note template.
-17. **Update Note Template**: A user can update their templates, editing the components. 
+17. **Update Note Template**: A user can update their templates, adding and removing fields, changing title or tags. 
 18. **Delete Note Template**: A user can delete their templates, and will not be able to use it for future notes. 
 
 - In addition to that: sign up, sign in, sign out and delete account use cases from M1.
@@ -109,16 +109,16 @@ NOTES: 5 most major use cases
 **Main success scenario**:
 1. User presses the Create icon button.
 2. System displays the creation screen.
-3. User presses the Create a blank note button button, or click on one of the available templates.
+3. User presses the Create a blank note button button, or clicks on one of the available templates.
 4. System displays the note creation screen, set to note mode: With a title field, tag field and a button to add content fields. If user selected a template, fields contained by the template appear, with label set to what is in the template and with content ready to be filled in.
-5. User customizes the note to their desire by adding/removing/setting the content of the input fields around the space available. The tag and title fields are not removable.
-6. User clicks the “Create” confirmation button
-7. System saves the note and navigates back to the note screen where the created note is visible
+5. User customizes the note to their desire by adding/removing/setting the content of the input fields, and by specifying tags and title. The tag and title fields are not removable.
+6. User clicks the “Create” confirmation button.
+7. System saves the note and navigates back to the note screen where the created note is visible.
 
 
 **Failure scenario(s)**:
 - 4a. The loading of the note template failed
-    - 4a1. A not pre-filled creation screen opens with a relevant error messsage.
+    - 4a1. A not pre-filled note creation screen opens with a relevant error messsage.
 - 7a. The note could not be created (client side, missing inputs)
     - 7a1. System displays a warning message prompting the user to at least create one field, add at least one tag, or set the title, depending on which of the three is missing
 - 7b. The note could not be created (server side)
@@ -166,12 +166,12 @@ NOTES: 5 most major use cases
 3. User presses the Create a new template button.
 4. System displays the note creation screen, set to template mode: With a title field, tag field and a button to add content fields.
 5. User customizes the note template to their desire by adding/removing the input fields around the space available. The tag and title fields are not removable.
-6. User clicks the “Create” confirmation button
-7. System saves the note template and navigates back to the creation screen where the template is visible
+6. User clicks the “Create” confirmation button.
+7. System saves the note template and navigates back to the creation screen where the template is visible.
 
 **Failure scenario(s)**:
 - 7a. Creation of note template failed (server-side)
-    - 7a1. System displays error message stating the reason and tells the user to retry
+    - 7a1. System displays error message stating the reason of failure.
 - 7b. Creation of note template failed (user-error)
     - 7b1. System displays error message, pointing to areas in the template that the user may need to fix. This can be: no title given, no tags given, no content fields added.
 
@@ -193,17 +193,17 @@ NOTES: 5 most major use cases
 1. User clicks the “Create Workspace” button
 2. System displays input an input field for the name of the workspace to be created
 3. User fills in the required name field.
-4. A create button becomes available to the user
-5. User clicks the “Create” confirmation button
-6. System receives the input and creates the corresponding workspace with the user being the workspace manager
-7. System displays the newly created workspace to the user
+4. A create button becomes available to the user.
+5. User clicks the “Create” confirmation button.
+6. System receives the input and creates the corresponding workspace with the user being the workspace manager.
+7. System displays the newly created workspace to the user.
 
 
 **Failure scenario(s)**:
-- 5a. Workspace name entered by the user is already taken by another workspace
-    - 5a1. System refuses to create the workspace (no navigation away from the page)
-    - 5a2. A relevant error message is displayed
-- 5b. Could not create workspace (server side issue)
+- 5a. Workspace name entered by the user is already taken by another workspace.
+    - 5a1. System refuses to create the workspace (no navigation away from the page).
+    - 5a2. A relevant error message is displayed.
+- 5b. Could not create workspace (server side issue).
     - 5a1. System does not navigate away from the workspace creation screen and the relevant error message is displayed.
 
 
@@ -223,15 +223,15 @@ NOTES: 5 most major use cases
 **Primary actor(s)**: Workspace Member
    
 **Main success scenario**:
-1. Workspace Member navigates into the chat screen of any of the workspaces they are in
-2. System displays the chat screen
-3. Workspace Member inputs text and clicks the send button
-4. System receives the input and displays it on the screen of every user in the workspace
+1. Workspace Member navigates into the chat screen of any of the workspaces they are in.
+2. System displays the chat screen.
+3. Workspace Member inputs text and clicks the send button.
+4. System receives the input and displays it on the screen of every user in the workspace.
 
 **Failure scenario(s)**:
-- 3a. The message couldn’t be sent (server issue)
-    - 3a1. System displays error message indicating the error code and reason
-- 3b. The message was empty, or composed just of spaces
+- 3a. The message couldn’t be sent (server issue).
+    - 3a1. System displays error message indicating the error code and reason.
+- 3b. The message was empty, or composed just of spaces.
     - 3b1. The chat message is not sent.
 
 
@@ -248,15 +248,15 @@ NOTES: 5 most major use cases
 <a name="nfr1"></a>
 
 1. **[Feature Accessibility]**
-   - **[Description]**: Any workspace of conversation the user is a member of has to be accessible to the user within two clicks from the main screen.
+   - **[Description]**: Notes, Template and Chat of any workspace the user is a member of (including their personal one) has to be accessible to the user within two clicks from the main screen.
    - **Justification**: Several messaging/file sharing applications, such as Discord, have every conversation reachable with maximum of 2 clicks (Discord server - specific channel, or discord dms - particular chat; WhatsApp community - particular chat). The app will be feature-rich, however it should still be competitive wrt. usability.
 
 2. **[Searching Speed]**
-   - **Description**: Producing the result of synonymic search filtered with tags on the backend side should last no longer than 5 seconds
-   - **Justification**: Synonymic searching includes calling an API to check for synonyms. While this process can take time and fitting below a second of response time is unlikely (at least not guaranteeable before actual tests with the API), we should not get close to the 10 seconds response limit mentioned in https://www.nngroup.com/articles/response-times-3-important-limits/
-   The 10 seconds is the user attention limit, i.e. the time the user is said to be willing to wait without attempting to focus on other tasks. As we envision synonymic search being used frequently, getting close to this limit on regular basis would mean straining the user attention, hence we impose a safety factor of 2.
-   One might point out that while the note database gets larger, there is more notes to search and more matches, hence the response time shall increase. This is why the requirement only concerns itself with one page of search results. Indeed this requirement can only be tested for a specified amount of notes, in our case it has been tested with 400 potentially matching notes, which we consider suitable for a regular worksapce used by a few users. If one were to adapt this app to much larger flows of notes, there are ways to keep the response time bounded such as returning only up to n best matches to search criterion, or employing parallel computation. 
-   The requirements for search and filter use cases have been merged together into this one, due to the app always filtering and then applying KNN on the already filtered notes.
+   - **Description**: Producing the result of synoptic search filtered with tags on the backend side should last no longer than 5 seconds
+   - **Justification**: Synonymic searching includes calling an API to check vectorize the query. While this process can take time and fitting below a second of response time is unlikely (at least not guaranteeable before actual tests with the API), we should not get close to the 10 seconds response limit mentioned in https://www.nngroup.com/articles/response-times-3-important-limits/
+   The 10 seconds is the user attention limit, i.e. the time the user is said to be willing to wait without attempting to focus on other tasks. As we envision the search being used frequently, getting close to this limit on regular basis would mean straining the user attention, hence we impose a safety factor of 2. Another reason for the safety factor is the time required for the frontend to send, and then process the recived request.
+   One might point out that while the note database gets larger, there is more notes to search and more matches, hence the response time shall increase. Indeed this requirement can only be tested for a specified amount of notes, in our case it has been tested with 400 potentially matching notes, which we consider suitable for a regular worksapce used by a few users. If one were to adapt this app to much larger flows of notes, there are ways to keep the response time bounded such as returning only up to n best matches to search criterion, or employing parallel computation. 
+   The requirements for search and filter use cases have been merged together into this one, due to the app always filtering and then applying KNN to the already filtered notes.
 
 
 ## 4. Designs Specification
@@ -555,9 +555,9 @@ The dependency of Users on interfaces from other components is because user dele
 
 ### **4.7. Design and Ways to Test Non-Functional Requirements**
 1. [**[Feature Accessibility]**](#nfr1)
-    - **Validation**: If you are at the home screen, you can click on the workspaces icon on the bottom (4th from the left), then click the chat icon of any workspace to view messages. This meets the “two click” requirements that we had set before. there is an automated frontend end-to-end test that cecks whether creation screen of personal workspace, personal chat, and content, create and chat screens of a workspace are reachable from the main screen within 2 clicks.
+    - **Validation**: If you are at the home screen, you can click on the workspaces icon on the bottom (4th from the left), then click the content/template/chat icon of any workspace to view messages. This meets the “two click” requirements that we had set. there is an automated frontend end-to-end test that cecks whether creation screen of personal workspace, personal chat, and content, create and chat screens of a workspace are reachable from the main screen within 2 clicks.
 2. [**[Searching Speed]**](#nfr2)
-    - **Validation**: A test workspace of 400 notes has been created. It has been verified with automated backend integration test that call the search endpoint produces a result in less than 5 seconds.
+    - **Validation**: A test workspace of 400 notes has been created. It has been verified with automated backend integration test that a call to the search endpoint produces a result in less than 5 seconds.
 
 
 
