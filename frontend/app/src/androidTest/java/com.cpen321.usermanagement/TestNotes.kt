@@ -29,7 +29,7 @@ import androidx.compose.ui.test.performClick
 class TestNotes {
 
     companion object {
-        const val ACCT_NAME:String = "mou"
+        const val ACCT_NAME:String = "Thing4G"
         const val WORKSPACE_1 = "Workspace1"
         const val WORKSPACE_2 = "Workspace2"
 
