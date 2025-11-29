@@ -602,7 +602,7 @@ The dependency of Users on interfaces from notes and workspaces is because user 
 2. [**[SEARCH NOTE]**](#uc2)\
 ![image info](./graphics/SearchNotes.png)
 
-3. [**[CREATE A NOTE TEMPLATE]**](#uc3)\
+3. [**[CREATE NOTE TEMPLATE]**](#uc3)\
 ![image info](./graphics/CreateNoteTemplate.jpg)
 
 4. [**[CREATE WORKSPACE]**](#uc4)\
