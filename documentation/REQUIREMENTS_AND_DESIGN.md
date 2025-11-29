@@ -16,6 +16,7 @@
 | 26.10.2025 | 4.6 | Added sequence diagrams for components |
 | 10.11.2025 | 3.5, 3.7 | Revised the formal use case specifications to the state of the app in M4. This is to provide a reference for testing
 | 27.11.2025 | 3.* | Revised the entire requirement specification. This is first to resolve the dilema the croup had between copying notes and creating from template - now bothoptions are available. Create from template allows to create a note from template, Copy copies template as template and notes as notes. Secondly, since we do not want workspace manager to leave the workspace, we had to create two more actors for workspace member and workspace regular member and rework the inheritance between them. Formal use case specification changed so that every use case has separate error handling for client-side (user) errors, and server-side issues. A lot of consistency changes as well.
+| 28.11.2025 | 4.5 | Updated the dependency justification to describe the situation with the message component
 ---
 
 
@@ -200,11 +201,8 @@ NOTES: 5 most major use cases
 
 
 **Failure scenario(s)**:
-- 5a. Workspace name entered by the user is already taken by another workspace.
-    - 5a1. System refuses to create the workspace (no navigation away from the page).
-    - 5a2. A relevant error message is displayed.
-- 5b. Could not create workspace (server side issue).
-    - 5a1. System does not navigate away from the workspace creation screen and the relevant error message is displayed.
+- 5b. Could not create workspace (server side issue, such as connection lossor workspace with the same name already exists).
+    - 5a1. System does not navigate away from the workspace creation screen and an error message is displayed.
 
 
 
@@ -478,6 +476,29 @@ NOTES: 5 most major use cases
             ```
             - **Purpose**: Exposes workspace retrieval by ID. Called by NoteService methods to verify workspace existence and membership before allowing note operations. Used in getNotes(), moveNoteToWorkspace(), and copyNoteToWorkspace().
 
+4. **Messages**
+    - **Purpose**: The messages component handles real-time chat functionality within workspaces. It manages creating, retrieving, and deleting chat messages, enabling workspace members to communicate with each other. Messages are tied to specific workspaces and ordered chronologically.
+    - **Interfaces**:
+        1. **getMessages**
+            - `GET /messages/workspace/{workspaceId}`
+            - **Headers**: `Authorization: Bearer {token}`
+            - **Query**: `limit (optional, default 50, max 100), before (optional, ISO date string for cursor-based pagination)`
+            - **Response**: `200 OK { messages[] }` | `400 Bad Request` | `403 Forbidden` | `404 Not Found`
+            - **Purpose**: Retrieves chat messages for a workspace. Returns messages sorted by creation date (newest first). Supports cursor-based pagination using the `before` parameter to fetch older messages.
+
+        2. **createMessage**
+            - `POST /messages/workspace/{workspaceId}`
+            - **Headers**: `Authorization: Bearer {token}`
+            - **Body**: `{ "content": string }`
+            - **Response**: `201 Created { message }` | `400 Bad Request` | `403 Forbidden` | `404 Not Found`
+            - **Purpose**: Creates a new chat message in the specified workspace. Content must be 1-5000 characters. Updates the workspace's latest message timestamp for polling functionality.
+
+        3. **deleteMessage**
+            - `DELETE /messages/{messageId}`
+            - **Headers**: `Authorization: Bearer {token}`
+            - **Response**: `200 OK { message: "Message deleted successfully" }` | `403 Forbidden` | `404 Not Found`
+            - **Purpose**: Deletes a specific message. Only the workspace owner can delete messages, providing moderation capability.
+
 
 **External Interfaces Used**:
 1. **OpenAI Embeddings API**
@@ -531,7 +552,7 @@ NOTES: 5 most major use cases
 ### **4.5. Dependencies Diagram**
 ![image info](./graphics/backendD.png)
 
-The dependency of Users on interfaces from other components is because user deletion. When a user gets deleted, Users have to notify all other modules to remove all notes, messages and workspaces associated only with the user being deleted and make the user no longer an active member of any workspace they were in.
+The dependency of Users on interfaces from notes and workspaces is because user deletion. When a user gets deleted, Users have to notify all other modules to remove all notes and workspaces associated only with the user being deleted and make the user no longer an active member of any workspace they were in. User deletion however does not remove the past chat messages associated with them. The messages depend on workspace due to checking for live updates.
 
 
 ### **4.6. Use Case Sequence Diagram (5 Most Major Use Cases)**

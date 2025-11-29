@@ -377,9 +377,24 @@ code {
 </thead>
 <tbody>
 <tr>
-<td><em>Nothing to show</em></td>
-<td></td>
-<td></td>
+<td>29.11.2025</td>
+<td>2.1.1</td>
+<td>Updated backend test chart with correct line numbers after refactor, listed specific mocked components</td>
+</tr>
+<tr>
+<td>27.11.2025</td>
+<td>4.1</td>
+<td>More detailed setup instructions</td>
+</tr>
+<tr>
+<td>27.11.2025</td>
+<td>3.2, 4.*</td>
+<td>Moved the frontend nonfunctional from frontend to nonfunctional</td>
+</tr>
+<tr>
+<td>28.11.2025</td>
+<td>4.2</td>
+<td>Updated the specification of TestNotes after making changes to template functionality</td>
 </tr>
 </tbody>
 </table>
@@ -387,7 +402,7 @@ code {
 <h2 id="2-back-end-test-specification-apis">2. Back-end Test Specification: APIs</h2>
 <h3 id="21-locations-of-back-end-tests-and-instructions-to-run-them">2.1. Locations of Back-end Tests and Instructions to Run Them</h3>
 <h4 id="211-tests">2.1.1. Tests</h4>
-<h4 id="notes-api">Notes API</h4>
+<h5 id="notes-api">Notes API</h5>
 <table>
 <thead>
 <tr>
@@ -400,55 +415,55 @@ code {
 <tbody>
 <tr>
 <td>POST <code>/api/notes</code></td>
-<td><code>backend/src/__tests__/unmocked/notes.normal.test.ts#L40</code></td>
-<td><code>backend/src/__tests__/mocked/notes.mocked.test.ts#L51</code></td>
-<td><code>noteService.createNote</code>, OpenAI embeddings client</td>
+<td><code>backend/src/__tests__/unmocked/notes.normal.test.ts#L46</code></td>
+<td><code>backend/src/__tests__/mocked/notes.mocked.test.ts#L66</code></td>
+<td>Notes, OpenAI</td>
 </tr>
 <tr>
 <td>PUT <code>/api/notes/:id</code></td>
-<td><code>#L282</code></td>
-<td><code>#L202</code></td>
-<td><code>noteService.updateNoteById</code></td>
+<td><code>#L288</code></td>
+<td><code>#L219</code></td>
+<td>Notes, OpenAI</td>
 </tr>
 <tr>
 <td>DELETE <code>/api/notes/:id</code></td>
-<td><code>#L398</code></td>
-<td><code>#L298</code></td>
-<td><code>noteService.deleteNote</code></td>
+<td><code>#L406</code></td>
+<td><code>#L315</code></td>
+<td>Notes</td>
 </tr>
 <tr>
 <td>GET <code>/api/notes/:id</code></td>
-<td><code>#L462</code></td>
-<td><code>#L253</code></td>
-<td><code>noteService.getNoteById</code></td>
+<td><code>#L470</code></td>
+<td><code>#L270</code></td>
+<td>Notes</td>
 </tr>
 <tr>
 <td>GET <code>/api/notes</code></td>
-<td><code>#L528</code></td>
-<td><code>#L343</code></td>
-<td><code>noteService.searchNotes</code>, OpenAI embeddings</td>
+<td><code>#L537</code></td>
+<td><code>#L360</code></td>
+<td>Notes, Workspaces, OpenAI</td>
 </tr>
 <tr>
 <td>GET <code>/api/notes/:id/workspaces</code></td>
-<td><code>#L893</code></td>
-<td><code>#L620</code></td>
-<td><code>workspaceModel.findById</code></td>
+<td><code>#L910</code></td>
+<td><code>#L643</code></td>
+<td>Notes</td>
 </tr>
 <tr>
 <td>POST <code>/api/notes/:id/share</code></td>
-<td><code>#L662</code></td>
-<td><code>#L665</code></td>
-<td><code>noteService.shareNoteToWorkspace</code>, <code>workspaceModel</code></td>
+<td><code>#L671</code></td>
+<td><code>#L688</code></td>
+<td>Notes, Workspaces</td>
 </tr>
 <tr>
 <td>POST <code>/api/notes/:id/copy</code></td>
-<td><code>#L784</code></td>
-<td><code>#L764</code></td>
-<td><code>noteService.copyNote</code>, <code>workspaceModel</code></td>
+<td><code>#L793</code></td>
+<td><code>#L787</code></td>
+<td>Notes</td>
 </tr>
 </tbody>
 </table>
-<h4 id="workspaces-api">Workspaces API</h4>
+<h5 id="workspaces-api">Workspaces API</h5>
 <table>
 <thead>
 <tr>
@@ -461,91 +476,91 @@ code {
 <tbody>
 <tr>
 <td>POST <code>/api/workspace</code></td>
-<td><code>backend/src/__tests__/unmocked/workspace.normal.test.ts#L45</code></td>
-<td><code>backend/src/__tests__/mocked/workspace.mocked.test.ts#L237</code></td>
-<td><code>workspaceService.createWorkspace</code></td>
+<td><code>backend/src/__tests__/unmocked/workspace.normal.test.ts#L44</code></td>
+<td><code>backend/src/__tests__/mocked/workspace.mocked.test.ts#L51</code></td>
+<td>Workspaces</td>
 </tr>
 <tr>
 <td>GET <code>/api/workspace/personal</code></td>
-<td><code>#L167</code></td>
-<td><code>#L277</code></td>
-<td><code>workspaceService.getPersonalWorkspaces</code></td>
+<td><code>#L166</code></td>
+<td><code>#L94</code></td>
+<td>Workspaces</td>
 </tr>
 <tr>
 <td>GET <code>/api/workspace/user</code></td>
-<td><code>#L290</code></td>
-<td><code>#L330</code></td>
-<td><code>workspaceService.getUserWorkspaces</code></td>
+<td><code>#L281</code></td>
+<td><code>#L147</code></td>
+<td>Workspaces</td>
 </tr>
 <tr>
 <td>GET <code>/api/workspace/:id</code></td>
-<td><code>#L352</code></td>
-<td><code>#L364</code></td>
-<td><code>workspaceService.getWorkspaceById</code></td>
+<td><code>#L343</code></td>
+<td><code>#L181</code></td>
+<td>Workspaces</td>
 </tr>
 <tr>
 <td>GET <code>/api/workspace/:id/members</code></td>
-<td><code>#L410</code></td>
-<td><code>#L398</code></td>
-<td><code>workspaceService.getMembers</code>, <code>notificationService</code></td>
+<td><code>#L401</code></td>
+<td><code>#L215</code></td>
+<td>Workspaces, Firebase Cloud Messaging</td>
 </tr>
 <tr>
 <td>GET <code>/api/workspace/:id/tags</code></td>
-<td><code>#L454</code></td>
-<td><code>#L448</code></td>
-<td><code>workspaceService.getWorkspaceTags</code></td>
+<td><code>#L445</code></td>
+<td><code>#L265</code></td>
+<td>Workspaces</td>
 </tr>
 <tr>
 <td>GET <code>/api/workspace/:id/membership/:userId</code></td>
-<td><code>#L536</code></td>
-<td><code>#L482</code></td>
-<td><code>workspaceService.getMembership</code></td>
+<td><code>#L527</code></td>
+<td><code>#L299</code></td>
+<td>Workspaces</td>
 </tr>
 <tr>
 <td>POST <code>/api/workspace/:id/members</code></td>
-<td><code>#L619</code></td>
-<td><code>#L516</code></td>
-<td><code>workspaceService.addMembers</code>, <code>notificationService</code></td>
+<td><code>#L610</code></td>
+<td><code>#L333</code></td>
+<td>Workspaces, Firebase Cloud Messaging</td>
 </tr>
 <tr>
 <td>POST <code>/api/workspace/:id/leave</code></td>
-<td><code>#L847</code></td>
-<td><code>#L694</code></td>
-<td><code>workspaceService.leaveWorkspace</code></td>
+<td><code>#L838</code></td>
+<td><code>#L570</code></td>
+<td>Workspaces</td>
 </tr>
 <tr>
 <td>PUT <code>/api/workspace/:id</code></td>
-<td><code>#L959</code></td>
-<td><code>#L712</code></td>
-<td><code>workspaceService.updateWorkspace</code></td>
+<td><code>#L950</code></td>
+<td><code>#L588</code></td>
+<td>Workspaces</td>
 </tr>
 <tr>
 <td>PUT <code>/api/workspace/:id/picture</code></td>
-<td><code>#L1051</code></td>
-<td><code>#L748</code></td>
-<td><code>workspaceService.updateWorkspacePicture</code>, <code>storage</code></td>
+<td><code>#L1042</code></td>
+<td><code>#L624</code></td>
+<td>Workspaces, Media</td>
 </tr>
 <tr>
 <td>DELETE <code>/api/workspace/:id/members/:userId</code></td>
-<td><code>#L1156</code></td>
-<td><code>#L784</code></td>
-<td><code>workspaceService.removeMember</code></td>
+<td><code>#L1147</code></td>
+<td><code>#L660</code></td>
+<td>Workspaces</td>
 </tr>
 <tr>
 <td>DELETE <code>/api/workspace/:id</code></td>
-<td><code>#L1323</code></td>
-<td><code>#L818</code></td>
-<td><code>workspaceService.deleteWorkspace</code>, <code>notificationService</code></td>
+<td><code>#L1314</code></td>
+<td><code>#L694</code></td>
+<td>Workspaces, Firebase Cloud Messaging</td>
 </tr>
 <tr>
 <td>GET <code>/api/workspace/:id/poll</code></td>
-<td><code>#L1429</code></td>
-<td><code>#L852</code></td>
-<td><code>workspaceService.getWorkspaceWithPolling</code></td>
+<td><code>#L1420</code></td>
+<td><code>#L728</code></td>
+<td>Workspaces</td>
 </tr>
 </tbody>
 </table>
-<h4 id="authentication-api">Authentication API</h4>
+<h5 id="authentication-api">Authentication API</h5>
 <table>
 <thead>
 <tr>
@@ -558,25 +573,25 @@ code {
 <tbody>
 <tr>
 <td>POST <code>/api/auth/signup</code></td>
-<td><code>backend/src/__tests__/unmocked/auth.normal.test.ts#L123</code></td>
-<td><code>backend/src/__tests__/mocked/auth.mocked.test.ts#L74</code></td>
-<td><code>authService.signUp</code>, Google token verifier, <code>workspaceService</code></td>
+<td><code>backend/src/__tests__/unmocked/auth.normal.test.ts#L57</code></td>
+<td><code>backend/src/__tests__/mocked/auth.mocked.test.ts#L57</code></td>
+<td>Users, Workspaces, Google Auth</td>
 </tr>
 <tr>
 <td>POST <code>/api/auth/signin</code></td>
-<td><code>#L151</code></td>
-<td><code>#L290</code></td>
-<td><code>authService.signIn</code></td>
+<td><code>#L105</code></td>
+<td><code>#L453</code></td>
+<td>Users, Google Auth</td>
 </tr>
 <tr>
 <td>POST <code>/api/auth/dev-login</code></td>
-<td><code>#L68</code></td>
-<td><code>#L394</code></td>
-<td><code>authService.devLogin</code></td>
+<td><code>#L122</code></td>
+<td><code>#L655</code></td>
+<td>Users, Database</td>
 </tr>
 </tbody>
 </table>
-<h4 id="user-api">User API</h4>
+<h5 id="user-api">User API</h5>
 <table>
 <thead>
 <tr>
@@ -588,44 +603,44 @@ code {
 </thead>
 <tbody>
 <tr>
-<td>GET <code>/api/users/profile</code></td>
-<td><code>backend/src/__tests__/unmocked/user.normal.test.ts#L39</code></td>
+<td>GET <code>/api/user/profile</code></td>
+<td><code>backend/src/__tests__/unmocked/user.normal.test.ts#L44</code></td>
+<td><code>backend/src/__tests__/mocked/user.mocked.test.ts</code></td>
 <td>—</td>
-<td>—</td>
 </tr>
 <tr>
-<td>PUT <code>/api/users/profile</code></td>
-<td><code>#L57</code></td>
-<td><code>backend/src/__tests__/mocked/user.mocked.test.ts#L48</code></td>
-<td><code>userModel.updateOne</code>, <code>workspaceModel</code></td>
+<td>PUT <code>/api/user/profile</code></td>
+<td><code>#L76</code></td>
+<td><code>#L52</code></td>
+<td>Users, Workspaces</td>
 </tr>
 <tr>
-<td>DELETE <code>/api/users/profile</code></td>
-<td><code>#L166</code></td>
-<td><code>#L104</code></td>
-<td><code>workspaceModel</code>, notification service</td>
+<td>DELETE <code>/api/user/profile</code></td>
+<td><code>#L279</code></td>
+<td><code>#L125</code></td>
+<td>Workspaces</td>
 </tr>
 <tr>
-<td>POST <code>/api/users/fcm-token</code></td>
-<td><code>#L230</code></td>
-<td><code>#L155</code></td>
-<td><code>userModel.updateOne</code></td>
+<td>POST <code>/api/user/fcm-token</code></td>
+<td><code>#L494</code></td>
+<td><code>#L176</code></td>
+<td>Users</td>
 </tr>
 <tr>
-<td>GET <code>/api/users/:id</code></td>
-<td><code>#L273</code></td>
-<td><code>#L209</code></td>
-<td><code>userModel.findById</code></td>
+<td>GET <code>/api/user/:id</code></td>
+<td><code>#L630</code></td>
+<td><code>#L247</code></td>
+<td>Users</td>
 </tr>
 <tr>
-<td>GET <code>/api/users/email/:email</code></td>
-<td><code>#L318</code></td>
-<td><code>#L260</code></td>
-<td><code>userModel.findByEmail</code></td>
+<td>GET <code>/api/user/email/:email</code></td>
+<td><code>#L700</code></td>
+<td><code>#L349</code></td>
+<td>Users</td>
 </tr>
 </tbody>
 </table>
-<h4 id="message-api">Message API</h4>
+<h5 id="message-api">Message API</h5>
 <table>
 <thead>
 <tr>
@@ -638,25 +653,25 @@ code {
 <tbody>
 <tr>
 <td>GET <code>/api/messages/workspace/:workspaceId</code></td>
-<td><code>backend/src/__tests__/unmocked/message.normal.test.ts#L61</code></td>
-<td><code>backend/src/__tests__/mocked/message.mocked.test.ts#L67</code></td>
-<td><code>messageModel.findByWorkspace</code></td>
+<td><code>backend/src/__tests__/unmocked/message.normal.test.ts#L40</code></td>
+<td><code>backend/src/__tests__/mocked/message.mocked.test.ts#L48</code></td>
+<td>Messages</td>
 </tr>
 <tr>
 <td>POST <code>/api/messages/workspace/:workspaceId</code></td>
-<td><code>#L188</code></td>
-<td><code>#L91</code></td>
-<td><code>messageModel.create</code>, <code>workspaceModel</code></td>
+<td><code>#L181</code></td>
+<td><code>#L72</code></td>
+<td>Messages, Workspaces</td>
 </tr>
 <tr>
 <td>DELETE <code>/api/messages/:messageId</code></td>
-<td><code>#L261</code></td>
-<td><code>#L134</code></td>
-<td><code>messageModel.deleteOne</code></td>
+<td><code>#L268</code></td>
+<td><code>#L115</code></td>
+<td>Messages</td>
 </tr>
 </tbody>
 </table>
-<h4 id="media-api">Media API</h4>
+<h5 id="media-api">Media API</h5>
 <table>
 <thead>
 <tr>
@@ -669,9 +684,9 @@ code {
 <tbody>
 <tr>
 <td>POST <code>/api/media/upload</code></td>
-<td><code>backend/src/__tests__/unmocked/media.normal.test.ts#L56</code></td>
-<td><code>backend/src/__tests__/mocked/media.mocked.test.ts#L55</code></td>
-<td><code>storage.uploadImage</code>, file system stubs</td>
+<td><code>backend/src/__tests__/unmocked/media.normal.test.ts#L78</code></td>
+<td><code>backend/src/__tests__/mocked/media.mocked.test.ts#L54</code></td>
+<td>Media</td>
 </tr>
 </tbody>
 </table>
@@ -681,6 +696,7 @@ code {
 <ol>
 <li><code>cd backend</code></li>
 <li><code>npm install</code></li>
+<li>Add an OpenAI api key to your .env file. You can find our api key in the M5 Report.</li>
 <li><code>npm test</code></li>
 </ol>
 <hr>
@@ -720,8 +736,8 @@ code {
 </ul>
 <h4 id="frontend-%E2%80%93-two-click-navigation-testreachwithtwoclickskt">Frontend – Two-Click Navigation (<code>TestReachWithTwoClicks.kt</code>)</h4>
 <ul>
-<li><strong>How to run:</strong> <code>cd frontend &amp;&amp; ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.cpen321.usermanagement.TestReachWithTwoClicks</code></li>
-<li><strong>What it checks:</strong> Starting from the main workspace screen, the test traverses to note, template, and chat views—both within the current workspace and across other workspaces—counting taps to confirm every note-bearing screen is reachable in ≤2 clicks.</li>
+<li><strong>How to run:</strong> <code>cd frontend &amp;&amp; ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunner Arguments.class=com.cpen321.usermanagement.TestReachWithTwoClicks</code></li>
+<li><strong>What it checks:</strong> Starting from the main workspace screen, the test traverses to note, template, and chat views—both within the current workspace and across other workspaces — counting taps to confirm every note-bearing screen is reachable in ≤2 clicks.</li>
 </ul>
 <h3 id="32-test-verification-and-logs">3.2. Test Verification and Logs</h3>
 <h4 id="performance-search-speed">Performance: Search Speed</h4>
@@ -730,11 +746,31 @@ code {
 <li>Logs:</li>
 </ul>
 <p><img src="./graphics/backend-nonfunc-testlog.png" alt="image info"></p>
+<h4 id="accessibility-reach-note-screens-in-%E2%89%A42-clicks-testreachwith2clickskt">Accessibility: Reach Note Screens in ≤2 Clicks (<code>TestReachWith2Clicks.kt</code>)</h4>
+<p>This test verifies that from a workspace main screen, users can reach:</p>
+<ul>
+<li>templates screen</li>
+<li>chat screen</li>
+<li>content/templates/chat of another workspace</li>
+</ul>
+<p>All screens must be reachable in <strong>2 clicks or fewer</strong>.</p>
+<p>The test counts the number of clicks for each navigation path.</p>
+<ul>
+<li>Logs:</li>
+</ul>
+<p><img src="./graphics/frontend-nonfunct-testlog.png" alt="image info"></p>
 <hr>
 <h2 id="4-front-end-test-specification">4. Front-end Test Specification</h2>
-<p>This includes the non-functional requirement that every note/message containing screen must be reachable from the main screen within two clicks. This non-functional requirement can only be verified via frontend tests, hence it is included here as <code>TestReachWith2Clicks.kt</code>.</p>
 <h3 id="41-location-in-git">4.1. Location in Git</h3>
 <p><code>./frontend/app/src/androidTest/java/com.cpen321.usermanagement</code></p>
+<p>To run the frontend tests, one needs to have a working backend (deployed in the cloud or locally - .env setup in the backend test instructions).</p>
+<p>On top of that it is necessary to update the <code>frontend/local.properties</code> file:
+sdk.dir= ...sdk folder location on your computer
+API_BASE_URL= &quot;...url_to_backend/api&quot;
+IMAGE_BASE_URL=&quot;...path to a port on the emulator localhost&quot;
+GOOGLE_CLIENT_ID=&quot;...google client id&quot;</p>
+<p>Google client Id can be obtained by setting up a project in the Aoogle OAuth console and creating a web application. The client ID of the web application has to be posted into local.properties. On top of that, one needs to register the frontend app inside the Google OAuth Console. To do that one needs to obtain the development SHA-1 key of the application, generated by the gradle signingReport task. With the key obtained, one can enter the package name: com.cpen321.usermanagement, and the key into the Android client creation menu. While it is vital to create the android client, its Google client id should not be pasted into local.properties, only the backend Google client id.</p>
+<p>To set up the content inside the app one can either sign in on their Android Emulator with Thing4G and Friedrich van Aukstin dummy users, which have the right notes and workspaces pre-created, or create two accounts and fill in their bios. In the latter case, one will need to pre-create notes and workspaces as per requirements of a specific test (the per test requirements are listed in comments at the beginning of each test file). One would also need to modify the test file's constants to reflect account names and gmails of the accounts used.</p>
 <h3 id="42-tests-included">4.2. Tests Included</h3>
 <h3 id="test-of-the-collaborate-feature-testcollaboratekt">Test of the “Collaborate” Feature (<code>TestCollaborate.kt</code>)</h3>
 <p><strong>Prerequisite:</strong></p>
@@ -802,31 +838,31 @@ code {
 <td></td>
 </tr>
 <tr>
-<td>5. Member selects “Invite User”.</td>
+<td>12. Member selects “Invite User”.</td>
 <td>Open Studies v2 → Manage Workspace → Invite icon.</td>
 </tr>
 <tr>
-<td>6. App shows input and button.</td>
+<td>13. App shows input and button.</td>
 <td>Verify email field + “Invite to Workspace” button visible.</td>
 </tr>
 <tr>
-<td>7a. Enter invalid email.</td>
+<td>14a. Enter invalid email.</td>
 <td>Enter “invalidemail”, click Invite.</td>
 </tr>
 <tr>
-<td>7a1. Error message shown.</td>
+<td>14a1. Error message shown.</td>
 <td>Check: <strong>“Could not retrieve profile matching the given email!”</strong></td>
 </tr>
 <tr>
-<td>7. Enter valid email.</td>
+<td>15. Enter valid email.</td>
 <td>Input teammate email → click Invite → expect <strong>“The user got added to the workspace.”</strong></td>
 </tr>
 <tr>
-<td>7b. Invite already-member user.</td>
+<td>15b. Invite already-member user.</td>
 <td>Enter existing member email and click Invite.</td>
 </tr>
 <tr>
-<td>7b1. Error message.</td>
+<td>15b1. Error message.</td>
 <td><strong>“The user is already a member!”</strong></td>
 </tr>
 <tr>
@@ -834,15 +870,15 @@ code {
 <td></td>
 </tr>
 <tr>
-<td>8. User opens workspace chat.</td>
+<td>16. User opens workspace chat.</td>
 <td>Open chat icon; verify chat screen shown.</td>
 </tr>
 <tr>
-<td>9a. Empty message.</td>
+<td>17a. Empty message.</td>
 <td>Send blank message; verify no change.</td>
 </tr>
 <tr>
-<td>9. Valid message.</td>
+<td>17. Valid message.</td>
 <td>Send “Hello team!”; verify appears with picture &amp; timestamp.</td>
 </tr>
 <tr>
@@ -850,7 +886,7 @@ code {
 <td></td>
 </tr>
 <tr>
-<td>10a. Non-manager tries editing workspace.</td>
+<td>18a. Non-manager tries editing workspace.</td>
 <td>Log out as the manager. Open edit screen as non-manager → fields should be greyed out.</td>
 </tr>
 <tr>
@@ -858,11 +894,11 @@ code {
 <td></td>
 </tr>
 <tr>
-<td>12. Non-manager clicks Leave.</td>
+<td>19. Non-manager clicks Leave.</td>
 <td>Open Studies v2 → Leave Workspace.</td>
 </tr>
 <tr>
-<td>13. App removes user.</td>
+<td>19. App removes user.</td>
 <td>Studies v2 no longer appears in workspace list.</td>
 </tr>
 <tr>
@@ -870,15 +906,15 @@ code {
 <td></td>
 </tr>
 <tr>
-<td>14. Manager opens Members screen.</td>
+<td>20. Manager opens Members screen.</td>
 <td>Log in as manager → Workspaces Screen → &lt;select &quot;Studies v2&quot;&gt; → Manage Workspace → Members icon.</td>
 </tr>
 <tr>
-<td>15. Manager bans user.</td>
+<td>21. Manager bans user.</td>
 <td>Click trash next to user.</td>
 </tr>
 <tr>
-<td>16. User banned permanently.</td>
+<td>22. User banned permanently.</td>
 <td>User removed, cannot be re-invited → <strong>“That user is banned”</strong> message should show upon an invite attempt</td>
 </tr>
 <tr>
@@ -886,11 +922,11 @@ code {
 <td></td>
 </tr>
 <tr>
-<td>17. Manager deletes workspace.</td>
+<td>23. Manager deletes workspace.</td>
 <td>Click Delete Workspace (trash icon).</td>
 </tr>
 <tr>
-<td>18. Workspace deleted.</td>
+<td>24. Workspace deleted.</td>
 <td>Studies v2 disappears and an appropriate success meassage is shown.</td>
 </tr>
 </tbody>
@@ -913,124 +949,136 @@ Two pre-existing workspaces.</p>
 <td></td>
 </tr>
 <tr>
-<td>1. Open “Create Note” screen.</td>
-<td>Tap pencil icon.</td>
+<td>1. Open &quot;Create Note&quot; screen.</td>
+<td>Tap pencil icon in workspace screen.</td>
 </tr>
 <tr>
 <td>2. App shows metadata fields and create button.</td>
-<td>Verify “Note Type”, “Tags”, “Fields”.</td>
+<td>Verify &quot;Create Note&quot; button present.</td>
 </tr>
 <tr>
-<td>3a. Create note with no fields.</td>
-<td>Click Create with no fields.</td>
+<td>3a. Create note with no title.</td>
+<td>Click &quot;Create Note&quot; button. Don't input title. Click &quot;Create&quot;.</td>
 </tr>
 <tr>
 <td>3a1. Error.</td>
-<td><strong>“Please add at least one field”</strong></td>
+<td><strong>&quot;Please enter a title&quot;</strong></td>
 </tr>
 <tr>
-<td>3b. Create note with empty field label.</td>
-<td>Add field but leave label blank; click Create.</td>
+<td>3. Add title.</td>
+<td>Enter &quot;Test Note&quot;.</td>
 </tr>
 <tr>
-<td>3b1. Error.</td>
-<td><strong>“All fields must have a label”</strong></td>
+<td>4a. Create note with no fields.</td>
+<td>Click &quot;Create&quot; with no fields added.</td>
 </tr>
 <tr>
-<td>3. User fills fields.</td>
-<td>Add tag(s), add field “Notes”, enter content.</td>
+<td>4a1. Error.</td>
+<td><strong>&quot;Please add at least one field&quot;</strong></td>
 </tr>
 <tr>
-<td>4. Click Create.</td>
-<td></td>
+<td>4b. Create note with empty field label.</td>
+<td>Add field (select TEXT type). Add tag &quot;important&quot;. Clear field label; click &quot;Create&quot;.</td>
 </tr>
 <tr>
-<td>5. Note created.</td>
-<td>Verify note appears.</td>
+<td>4b1. Error.</td>
+<td><strong>&quot;All fields must have a label&quot;</strong></td>
+</tr>
+<tr>
+<td>4. Add field label and content.</td>
+<td>Input field label &quot;Notes&quot;. Input content in field.</td>
+</tr>
+<tr>
+<td>5. Click Create.</td>
+<td>Click &quot;Create&quot;.</td>
+</tr>
+<tr>
+<td>6. Note created.</td>
+<td>Verify note &quot;Test Note&quot; appears in workspace.</td>
 </tr>
 <tr>
 <td><strong>Update Note</strong></td>
 <td></td>
 </tr>
 <tr>
-<td>6. Open note to edit.</td>
-<td>Click pencil icon on note.</td>
+<td>7. Open note to edit.</td>
+<td>Navigate to note → click pencil icon.</td>
 </tr>
 <tr>
-<td>7. App shows editable fields.</td>
-<td>Verify tag add/remove.</td>
+<td>8. App shows editable fields.</td>
+<td>Verify fields editable. Verify tags can be added/removed (click existing tag).</td>
 </tr>
 <tr>
-<td>8. Modify content &amp; tags.</td>
-<td></td>
+<td>9. Modify content &amp; tags.</td>
+<td>Change field content. Add new tag. Remove existing tag.</td>
 </tr>
 <tr>
-<td>9. Click Save.</td>
-<td></td>
+<td>10. Click Save.</td>
+<td>Click &quot;Save&quot;.</td>
 </tr>
 <tr>
-<td>10. Note updated.</td>
-<td>Verify new values.</td>
+<td>11. Note updated.</td>
+<td>Verify changes reflected in Note Details screen.</td>
 </tr>
 <tr>
 <td><strong>Share Note</strong></td>
 <td></td>
 </tr>
 <tr>
-<td>11. Select “Share Note”.</td>
-<td>Click Share icon.</td>
+<td>12. Select &quot;Share Note&quot;.</td>
+<td>Open note edit screen → click Share icon.</td>
 </tr>
 <tr>
-<td>12. Workspace selection dialog.</td>
-<td>Verify “Share Note” + workspace list.</td>
+<td>13. Workspace selection dialog.</td>
+<td>Verify &quot;Share Note&quot; + workspace list visible.</td>
 </tr>
 <tr>
-<td>13. Select workspace &amp; confirm.</td>
-<td>Click Share.</td>
+<td>14. Select workspace &amp; confirm.</td>
+<td>Select workspace → click &quot;Share&quot;.</td>
 </tr>
 <tr>
-<td>14. Note shared.</td>
-<td><strong>“Note shared to workspace successfully”</strong>, note moves workspaces.</td>
+<td>15. Note shared.</td>
+<td><strong>&quot;Note shared to workspace successfully&quot;</strong>. Verify note in target workspace, removed from original.</td>
 </tr>
 <tr>
 <td><strong>Copy Note</strong></td>
 <td></td>
 </tr>
 <tr>
-<td>15. Select “Copy Note”.</td>
-<td>Click Copy icon.</td>
+<td>16. Select &quot;Copy Note&quot;.</td>
+<td>Open note edit screen → click Copy icon.</td>
 </tr>
 <tr>
-<td>16. Workspace selection.</td>
-<td>Verify UI.</td>
+<td>17. Workspace selection.</td>
+<td>Verify &quot;Copy Note&quot; + workspace list visible.</td>
 </tr>
 <tr>
-<td>17. Select workspace.</td>
-<td>Click Copy.</td>
+<td>18. Select workspace.</td>
+<td>Select workspace → click &quot;Copy&quot;.</td>
 </tr>
 <tr>
-<td>18. Note copied.</td>
-<td>Appears in both workspaces.</td>
+<td>19. Note copied.</td>
+<td>Verify note appears in both target and source workspaces.</td>
 </tr>
 <tr>
 <td><strong>Delete Note</strong></td>
 <td></td>
 </tr>
 <tr>
-<td>19. Select “Delete Note”.</td>
-<td>Tap trash.</td>
+<td>20. Select &quot;Delete Note&quot;.</td>
+<td>Navigate to note → click trash icon.</td>
 </tr>
 <tr>
-<td>20. Confirmation dialog.</td>
-<td><strong>“Are you sure… cannot be undone”</strong></td>
+<td>21. Confirmation dialog.</td>
+<td>Verify &quot;Delete Note&quot; + <strong>&quot;Are you sure… cannot be undone&quot;</strong></td>
 </tr>
 <tr>
-<td>21. Confirm.</td>
-<td>Click Delete.</td>
+<td>22. Confirm.</td>
+<td>Click &quot;Delete&quot;.</td>
 </tr>
 <tr>
-<td>22. Note deleted.</td>
-<td>Verify removal.</td>
+<td>23. Note deleted.</td>
+<td><strong>&quot;Note successfully deleted&quot;</strong>. Verify note removed from workspace.</td>
 </tr>
 </tbody>
 </table>
@@ -1110,20 +1158,6 @@ Existing workspace with notes.</p>
 </tbody>
 </table>
 <p><img src="./graphics/frontend-retrieve-notes-testlog.png" alt="image info"></p>
-<hr>
-<h3 id="test-reach-note-screens-in-%E2%89%A42-clicks-testreachwith2clickskt">Test: Reach Note Screens in ≤2 Clicks (<code>TestReachWith2Clicks.kt</code>)</h3>
-<p>This test verifies that from a workspace main screen, users can reach:</p>
-<ul>
-<li>templates screen</li>
-<li>chat screen</li>
-<li>content/templates/chat of another workspace</li>
-</ul>
-<p>All screens must be reachable in <strong>2 clicks or fewer</strong>.</p>
-<p>The test counts the number of clicks for each navigation path.</p>
-<hr>
-<h3 id="test-logs">Test Logs</h3>
-<p><img src="./graphics/frontend-nonfunct-testlog.png" alt="image info"></p>
-<Place final print screens here>
 <hr>
 <h2 id="5-automated-code-review-results">5. Automated Code Review Results</h2>
 <h3 id="51-commit-hash-where-codacy-ran">5.1. Commit Hash Where Codacy Ran</h3>
