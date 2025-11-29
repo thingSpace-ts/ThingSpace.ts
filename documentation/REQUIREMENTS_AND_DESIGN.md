@@ -618,7 +618,7 @@ The dependency of Users on interfaces from notes and workspaces is because user 
 1. [**[Feature Accessibility]**](#nfr1)
     - **Validation**: If you are at the home screen, you can click on the workspaces icon on the bottom (4th from the left), then click the content/template/chat icon of any workspace to view messages. This meets the “two click” requirements that we had set. there is an automated frontend end-to-end test that cecks whether creation screen of personal workspace, personal chat, and content, create and chat screens of a workspace are reachable from the main screen within 2 clicks.
 2. [**[Searching Speed]**](#nfr2)
-    - **Validation**: A test workspace of 400 notes has been created. It has been verified with automated backend integration test that a call to the search endpoint produces a result in less than 5 seconds.
+    - **Validation**: A test workspace is created with 400 notes. It has been verified with automated backend integration test that the average latency of 3 calls to the search endpoint produces a result in less than 5 seconds. We do 3 queries to get a more accurate view on the actual latency. 
 
 
 
