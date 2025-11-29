@@ -20,11 +20,11 @@
 
 | Interface | Describe Group Location, No Mocks | Describe Group Location, With Mocks | Mocked Components |
 |---|---|---|---|
-| POST `/api/notes` | `backend/src/__tests__/unmocked/notes.normal.test.ts#L46` | `backend/src/__tests__/mocked/notes.mocked.test.ts#L66` | `noteService`, OpenAI embeddings client |
-| PUT `/api/notes/:id` | `#L288` | `#L219` | `noteService`, OpenAI embeddings client |
+| POST `/api/notes` | `backend/src/__tests__/unmocked/notes.normal.test.ts#L46` | `backend/src/__tests__/mocked/notes.mocked.test.ts#L66` | `noteService`, OpenAI API |
+| PUT `/api/notes/:id` | `#L288` | `#L219` | `noteService`, OpenAI API |
 | DELETE `/api/notes/:id` | `#L406` | `#L315` | `noteService` |
 | GET `/api/notes/:id` | `#L470` | `#L270` | `noteService` |
-| GET `/api/notes` | `#L537` | `#L360` | `noteService`, `workspaceModel`, OpenAI embeddings client |
+| GET `/api/notes` | `#L537` | `#L360` | `noteService`, `workspaceModel`, OpenAI API |
 | GET `/api/notes/:id/workspaces` | `#L910` | `#L643` | `noteService` |
 | POST `/api/notes/:id/share` | `#L671` | `#L688` | `noteService`, `workspaceModel`, `noteModel` |
 | POST `/api/notes/:id/copy` | `#L793` | `#L787` | `noteService`, `noteModel` |
