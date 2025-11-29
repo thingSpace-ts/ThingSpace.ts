@@ -5,7 +5,8 @@
 | **Change Date** | **Modified Sections** | **Rationale** |
 |-----------------|-----------------------|---------------|
 | 27.11.2025 | 4.1 | More detailed setup instructions|
-| 27.11.2025 | 3.2, 4.* | Moved the frontend nonfunctional from frontend to nonfunctional|
+| 27.11.2025 | 3.2, 4.* | Moved the frontend nonfunctional from frontend to nonfunctional |
+| 28.11.2025 | 4.2 | Updated the specification of TestNotes after making changes to template functionality |
 
 ---
 
@@ -206,7 +207,7 @@
 #### Frontend – Two-Click Navigation (`TestReachWithTwoClicks.kt`)
 - **How to run:** `cd frontend && ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunner
 Arguments.class=com.cpen321.usermanagement.TestReachWithTwoClicks`
-- **What it checks:** Starting from the main workspace screen, the test traverses to note, template, and chat views—both within the current workspace and across other workspaces—counting taps to confirm every note-bearing screen is reachable in ≤2 clicks.
+- **What it checks:** Starting from the main workspace screen, the test traverses to note, template, and chat views—both within the current workspace and across other workspaces — counting taps to confirm every note-bearing screen is reachable in ≤2 clicks.
 
 ### 3.2. Test Verification and Logs
 
@@ -241,8 +242,9 @@ The test counts the number of clicks for each navigation path.
 ### 4.1. Location in Git
 `./frontend/app/src/androidTest/java/com.cpen321.usermanagement`
 
-To run the frontend tests, one needs to have a working backend (deployed in the cloud or locally)
-on top of that it is necessary to update the `frontend/local.properties` file:
+To run the frontend tests, one needs to have a working backend (deployed in the cloud or locally - .env setup in the backend test instructions).
+
+On top of that it is necessary to update the `frontend/local.properties` file:
 sdk.dir= ...sdk folder location on your computer
 API_BASE_URL= "...url_to_backend/api"
 IMAGE_BASE_URL="...path to a port on the emulator localhost"
@@ -278,29 +280,29 @@ To set up the content inside the app one can either sign in on their Android Emu
 | 10. Manager navigates to “Edit Workspace”. | <After workspace creation, one is already at the edit workspace screen> |
 | 11. Edit title and bio. | Change title to “Studies v2” and bio “Study group”; click Save; expect “Profile updated successfully.” |
 | **Invite to Workspace** | |
-| 5. Member selects “Invite User”. | Open Studies v2 → Manage Workspace → Invite icon. |
-| 6. App shows input and button. | Verify email field + “Invite to Workspace” button visible. |
-| 7a. Enter invalid email. | Enter “invalidemail”, click Invite. |
-| 7a1. Error message shown. | Check: **“Could not retrieve profile matching the given email!”** |
-| 7. Enter valid email. | Input teammate email → click Invite → expect **“The user got added to the workspace.”** |
-| 7b. Invite already-member user. | Enter existing member email and click Invite. |
-| 7b1. Error message. | **“The user is already a member!”** |
+| 12. Member selects “Invite User”. | Open Studies v2 → Manage Workspace → Invite icon. |
+| 13. App shows input and button. | Verify email field + “Invite to Workspace” button visible. |
+| 14a. Enter invalid email. | Enter “invalidemail”, click Invite. |
+| 14a1. Error message shown. | Check: **“Could not retrieve profile matching the given email!”** |
+| 15. Enter valid email. | Input teammate email → click Invite → expect **“The user got added to the workspace.”** |
+| 15b. Invite already-member user. | Enter existing member email and click Invite. |
+| 15b1. Error message. | **“The user is already a member!”** |
 | **Send Chat Message** | |
-| 8. User opens workspace chat. | Open chat icon; verify chat screen shown. |
-| 9a. Empty message. | Send blank message; verify no change. |
-| 9. Valid message. | Send “Hello team!”; verify appears with picture & timestamp. |
+| 16. User opens workspace chat. | Open chat icon; verify chat screen shown. |
+| 17a. Empty message. | Send blank message; verify no change. |
+| 17. Valid message. | Send “Hello team!”; verify appears with picture & timestamp. |
 | **Update Workspace as Non-Manager** | |
-| 10a. Non-manager tries editing workspace. | Log out as the manager. Open edit screen as non-manager → fields should be greyed out. |
+| 18a. Non-manager tries editing workspace. | Log out as the manager. Open edit screen as non-manager → fields should be greyed out. |
 | **Leave Workspace (Non-Manager)** | |
-| 12. Non-manager clicks Leave. | Open Studies v2 → Leave Workspace. |
-| 13. App removes user. | Studies v2 no longer appears in workspace list. |
+| 19. Non-manager clicks Leave. | Open Studies v2 → Leave Workspace. |
+| 19. App removes user. | Studies v2 no longer appears in workspace list. |
 | **Ban Users** | |
-| 14. Manager opens Members screen. | Log in as manager → Workspaces Screen → <select "Studies v2"> → Manage Workspace → Members icon. |
-| 15. Manager bans user. | Click trash next to user. |
-| 16. User banned permanently. | User removed, cannot be re-invited → **“That user is banned”** message should show upon an invite attempt |
+| 20. Manager opens Members screen. | Log in as manager → Workspaces Screen → <select "Studies v2"> → Manage Workspace → Members icon. |
+| 21. Manager bans user. | Click trash next to user. |
+| 22. User banned permanently. | User removed, cannot be re-invited → **“That user is banned”** message should show upon an invite attempt |
 | **Delete Workspace** | |
-| 17. Manager deletes workspace. | Click Delete Workspace (trash icon). |
-| 18. Workspace deleted. | Studies v2 disappears and an appropriate success meassage is shown. |
+| 23. Manager deletes workspace. | Click Delete Workspace (trash icon). |
+| 24. Workspace deleted. | Studies v2 disappears and an appropriate success meassage is shown. |
 
 ![image info](./graphics/frontend-collaborate-testlog.png)
 

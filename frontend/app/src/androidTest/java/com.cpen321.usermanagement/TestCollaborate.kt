@@ -49,10 +49,11 @@ import kotlin.math.sign
 * Passwords as in attachments.
 * Fill in the bio's of the accounts (with anything, just not empty).
 *
-* In case this test case fails, there might be a ghost Study v2 workspace in Friedrich van Aukstin's
+* In case this test case fails, there might be a ghost Study v2 workspace in Thing4G's
 * workspaces. Please manually remove it before re-running the test.
 *
-* To run correctly, the test requires a pre-existing workspace called Test
+* To run correctly, the test requires a pre-existing workspace called Test and no workspaces named
+* Study or Study v2
 *
 * It might happen the UI Automator picks the wrong button on sign in. In this case:
 * 1) Invalidate cache
