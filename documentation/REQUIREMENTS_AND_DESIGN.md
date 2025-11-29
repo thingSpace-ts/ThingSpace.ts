@@ -16,6 +16,7 @@
 | 26.10.2025 | 4.6 | Added sequence diagrams for components |
 | 10.11.2025 | 3.5, 3.7 | Revised the formal use case specifications to the state of the app in M4. This is to provide a reference for testing
 | 27.11.2025 | 3.* | Revised the entire requirement specification. This is first to resolve the dilema the croup had between copying notes and creating from template - now bothoptions are available. Create from template allows to create a note from template, Copy copies template as template and notes as notes. Secondly, since we do not want workspace manager to leave the workspace, we had to create two more actors for workspace member and workspace regular member and rework the inheritance between them. Formal use case specification changed so that every use case has separate error handling for client-side (user) errors, and server-side issues. A lot of consistency changes as well.
+| 28.11.2025 | 4.5 | Updated the dependency justification to describe the situation with the message component
 ---
 
 
@@ -531,7 +532,7 @@ NOTES: 5 most major use cases
 ### **4.5. Dependencies Diagram**
 ![image info](./graphics/backendD.png)
 
-The dependency of Users on interfaces from other components is because user deletion. When a user gets deleted, Users have to notify all other modules to remove all notes, messages and workspaces associated only with the user being deleted and make the user no longer an active member of any workspace they were in.
+The dependency of Users on interfaces from notes and workspaces is because user deletion. When a user gets deleted, Users have to notify all other modules to remove all notes and workspaces associated only with the user being deleted and make the user no longer an active member of any workspace they were in. User deletion however does not remove the past chat messages associated with them. The messages depend on workspace due to checking for live updates.
 
 
 ### **4.6. Use Case Sequence Diagram (5 Most Major Use Cases)**
