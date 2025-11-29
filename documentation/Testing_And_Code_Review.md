@@ -161,6 +161,7 @@
 
 1. `cd backend`
 2. `npm install`
+3. Add an OpenAI api key to your .env file. You can find our api key in the M5 Report. 
 3. `npm test`
 
 ---
