@@ -20,66 +20,66 @@
 
 | Interface | Describe Group Location, No Mocks | Describe Group Location, With Mocks | Mocked Components |
 |---|---|---|---|
-| POST `/api/notes` | `backend/src/__tests__/unmocked/notes.normal.test.ts#L46` | `backend/src/__tests__/mocked/notes.mocked.test.ts#L66` | `noteService`, OpenAI embeddings client |
-| PUT `/api/notes/:id` | `#L288` | `#L219` | `noteService`, OpenAI embeddings client |
-| DELETE `/api/notes/:id` | `#L406` | `#L315` | `noteService` |
-| GET `/api/notes/:id` | `#L470` | `#L270` | `noteService` |
-| GET `/api/notes` | `#L537` | `#L360` | `noteService`, `workspaceModel`, OpenAI embeddings client |
-| GET `/api/notes/:id/workspaces` | `#L910` | `#L643` | `noteService` |
-| POST `/api/notes/:id/share` | `#L671` | `#L688` | `noteService`, `workspaceModel`, `noteModel` |
-| POST `/api/notes/:id/copy` | `#L793` | `#L787` | `noteService`, `noteModel` |
+| POST `/api/notes` | `backend/src/__tests__/unmocked/notes.normal.test.ts#L46` | `backend/src/__tests__/mocked/notes.mocked.test.ts#L66` | Notes, OpenAI |
+| PUT `/api/notes/:id` | `#L288` | `#L219` | Notes, OpenAI |
+| DELETE `/api/notes/:id` | `#L406` | `#L315` | Notes |
+| GET `/api/notes/:id` | `#L470` | `#L270` | Notes |
+| GET `/api/notes` | `#L537` | `#L360` | Notes, Workspaces, OpenAI |
+| GET `/api/notes/:id/workspaces` | `#L910` | `#L643` | Notes |
+| POST `/api/notes/:id/share` | `#L671` | `#L688` | Notes, Workspaces |
+| POST `/api/notes/:id/copy` | `#L793` | `#L787` | Notes |
 
 ##### Workspaces API
 
 | Interface | Describe Group Location, No Mocks | Describe Group Location, With Mocks | Mocked Components |
 |---|---|---|---|
-| POST `/api/workspace` | `backend/src/__tests__/unmocked/workspace.normal.test.ts#L44` | `backend/src/__tests__/mocked/workspace.mocked.test.ts#L51` | `workspaceService` |
-| GET `/api/workspace/personal` | `#L166` | `#L94` | `workspaceService` |
-| GET `/api/workspace/user` | `#L281` | `#L147` | `workspaceService` |
-| GET `/api/workspace/:id` | `#L343` | `#L181` | `workspaceService` |
-| GET `/api/workspace/:id/members` | `#L401` | `#L215` | `workspaceService`, `notificationService` |
-| GET `/api/workspace/:id/tags` | `#L445` | `#L265` | `workspaceService` |
-| GET `/api/workspace/:id/membership/:userId` | `#L527` | `#L299` | `workspaceService` |
-| POST `/api/workspace/:id/members` | `#L610` | `#L333` | `workspaceService`, `notificationService`, `userModel` |
-| POST `/api/workspace/:id/leave` | `#L838` | `#L570` | `workspaceService` |
-| PUT `/api/workspace/:id` | `#L950` | `#L588` | `workspaceService` |
-| PUT `/api/workspace/:id/picture` | `#L1042` | `#L624` | `workspaceService`, `mediaService` |
-| DELETE `/api/workspace/:id/members/:userId` | `#L1147` | `#L660` | `workspaceService` |
-| DELETE `/api/workspace/:id` | `#L1314` | `#L694` | `workspaceService`, `notificationService` |
-| GET `/api/workspace/:id/poll` | `#L1420` | `#L728` | `workspaceService` |
+| POST `/api/workspace` | `backend/src/__tests__/unmocked/workspace.normal.test.ts#L44` | `backend/src/__tests__/mocked/workspace.mocked.test.ts#L51` | Workspaces |
+| GET `/api/workspace/personal` | `#L166` | `#L94` | Workspaces |
+| GET `/api/workspace/user` | `#L281` | `#L147` | Workspaces |
+| GET `/api/workspace/:id` | `#L343` | `#L181` | Workspaces |
+| GET `/api/workspace/:id/members` | `#L401` | `#L215` | Workspaces, Firebase Cloud Messaging |
+| GET `/api/workspace/:id/tags` | `#L445` | `#L265` | Workspaces |
+| GET `/api/workspace/:id/membership/:userId` | `#L527` | `#L299` | Workspaces |
+| POST `/api/workspace/:id/members` | `#L610` | `#L333` | Workspaces, Users, Firebase Cloud Messaging |
+| POST `/api/workspace/:id/leave` | `#L838` | `#L570` | Workspaces |
+| PUT `/api/workspace/:id` | `#L950` | `#L588` | Workspaces |
+| PUT `/api/workspace/:id/picture` | `#L1042` | `#L624` | Workspaces, Media |
+| DELETE `/api/workspace/:id/members/:userId` | `#L1147` | `#L660` | Workspaces |
+| DELETE `/api/workspace/:id` | `#L1314` | `#L694` | Workspaces, Firebase Cloud Messaging |
+| GET `/api/workspace/:id/poll` | `#L1420` | `#L728` | Workspaces |
 
 ##### Authentication API
 
 | Interface | Describe Group Location, No Mocks | Describe Group Location, With Mocks | Mocked Components |
 |---|---|---|---|
-| POST `/api/auth/signup` | `backend/src/__tests__/unmocked/auth.normal.test.ts#L57` | `backend/src/__tests__/mocked/auth.mocked.test.ts#L57` | `authService`, `workspaceService`, Google OAuth2Client |
-| POST `/api/auth/signin` | `#L105` | `#L453` | `authService`, Google OAuth2Client |
-| POST `/api/auth/dev-login` | `#L122` | `#L655` | `authService`, `userModel` |
+| POST `/api/auth/signup` | `backend/src/__tests__/unmocked/auth.normal.test.ts#L57` | `backend/src/__tests__/mocked/auth.mocked.test.ts#L57` | Users, Workspaces, Google Auth |
+| POST `/api/auth/signin` | `#L105` | `#L453` | Users, Google Auth |
+| POST `/api/auth/dev-login` | `#L122` | `#L655` | Users, Database |
 
 ##### User API
 
 | Interface | Describe Group Location, No Mocks | Describe Group Location, With Mocks | Mocked Components |
 |---|---|---|---|
 | GET `/api/user/profile` | `backend/src/__tests__/unmocked/user.normal.test.ts#L44` | — | — |
-| PUT `/api/user/profile` | `#L76` | `backend/src/__tests__/mocked/user.mocked.test.ts#L52` | `userModel`, `workspaceModel` |
-| DELETE `/api/user/profile` | `#L279` | `#L125` | `workspaceModel`, `workspaceService` |
-| POST `/api/user/fcm-token` | `#L494` | `#L176` | `userModel` |
-| GET `/api/user/:id` | `#L630` | `#L247` | `userModel` |
-| GET `/api/user/email/:email` | `#L700` | `#L349` | `userModel` |
+| PUT `/api/user/profile` | `#L76` | `backend/src/__tests__/mocked/user.mocked.test.ts#L52` | Users, Workspaces |
+| DELETE `/api/user/profile` | `#L279` | `#L125` | Workspaces |
+| POST `/api/user/fcm-token` | `#L494` | `#L176` | Users |
+| GET `/api/user/:id` | `#L630` | `#L247` | Users |
+| GET `/api/user/email/:email` | `#L700` | `#L349` | Users |
 
 ##### Message API
 
 | Interface | Describe Group Location, No Mocks | Describe Group Location, With Mocks | Mocked Components |
 |---|---|---|---|
-| GET `/api/messages/workspace/:workspaceId` | `backend/src/__tests__/unmocked/message.normal.test.ts#L40` | `backend/src/__tests__/mocked/message.mocked.test.ts#L48` | `messageModel` |
-| POST `/api/messages/workspace/:workspaceId` | `#L181` | `#L72` | `messageModel`, `workspaceModel` |
-| DELETE `/api/messages/:messageId` | `#L268` | `#L115` | `messageModel` |
+| GET `/api/messages/workspace/:workspaceId` | `backend/src/__tests__/unmocked/message.normal.test.ts#L40` | `backend/src/__tests__/mocked/message.mocked.test.ts#L48` | Messages |
+| POST `/api/messages/workspace/:workspaceId` | `#L181` | `#L72` | Messages, Workspaces |
+| DELETE `/api/messages/:messageId` | `#L268` | `#L115` | Messages |
 
 ##### Media API
 
 | Interface | Describe Group Location, No Mocks | Describe Group Location, With Mocks | Mocked Components |
 |---|---|---|---|
-| POST `/api/media/upload` | `backend/src/__tests__/unmocked/media.normal.test.ts#L78` | `backend/src/__tests__/mocked/media.mocked.test.ts#L54` | `mediaService` |
+| POST `/api/media/upload` | `backend/src/__tests__/unmocked/media.normal.test.ts#L78` | `backend/src/__tests__/mocked/media.mocked.test.ts#L54` | Media |
 
 #### 2.1.2. Commit Hash Where Tests Run
 `c5f46d61177b82ff74c9c30dfd32a5e24de5d683`
