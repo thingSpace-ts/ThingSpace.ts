@@ -476,6 +476,29 @@ NOTES: 5 most major use cases
             ```
             - **Purpose**: Exposes workspace retrieval by ID. Called by NoteService methods to verify workspace existence and membership before allowing note operations. Used in getNotes(), moveNoteToWorkspace(), and copyNoteToWorkspace().
 
+4. **Messages**
+    - **Purpose**: The messages component handles real-time chat functionality within workspaces. It manages creating, retrieving, and deleting chat messages, enabling workspace members to communicate with each other. Messages are tied to specific workspaces and ordered chronologically.
+    - **Interfaces**:
+        1. **getMessages**
+            - `GET /messages/workspace/{workspaceId}`
+            - **Headers**: `Authorization: Bearer {token}`
+            - **Query**: `limit (optional, default 50, max 100), before (optional, ISO date string for cursor-based pagination)`
+            - **Response**: `200 OK { messages[] }` | `400 Bad Request` | `403 Forbidden` | `404 Not Found`
+            - **Purpose**: Retrieves chat messages for a workspace. Returns messages sorted by creation date (newest first). Supports cursor-based pagination using the `before` parameter to fetch older messages.
+
+        2. **createMessage**
+            - `POST /messages/workspace/{workspaceId}`
+            - **Headers**: `Authorization: Bearer {token}`
+            - **Body**: `{ "content": string }`
+            - **Response**: `201 Created { message }` | `400 Bad Request` | `403 Forbidden` | `404 Not Found`
+            - **Purpose**: Creates a new chat message in the specified workspace. Content must be 1-5000 characters. Updates the workspace's latest message timestamp for polling functionality.
+
+        3. **deleteMessage**
+            - `DELETE /messages/{messageId}`
+            - **Headers**: `Authorization: Bearer {token}`
+            - **Response**: `200 OK { message: "Message deleted successfully" }` | `403 Forbidden` | `404 Not Found`
+            - **Purpose**: Deletes a specific message. Only the workspace owner can delete messages, providing moderation capability.
+
 
 **External Interfaces Used**:
 1. **OpenAI Embeddings API**
