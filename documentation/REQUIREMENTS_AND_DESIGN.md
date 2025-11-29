@@ -201,11 +201,8 @@ NOTES: 5 most major use cases
 
 
 **Failure scenario(s)**:
-- 5a. Workspace name entered by the user is already taken by another workspace.
-    - 5a1. System refuses to create the workspace (no navigation away from the page).
-    - 5a2. A relevant error message is displayed.
-- 5b. Could not create workspace (server side issue).
-    - 5a1. System does not navigate away from the workspace creation screen and the relevant error message is displayed.
+- 5b. Could not create workspace (server side issue, such as connection lossor workspace with the same name already exists).
+    - 5a1. System does not navigate away from the workspace creation screen and an error message is displayed.
 
 
 
